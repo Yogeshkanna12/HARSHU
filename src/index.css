@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-canvas: #faf8f5;
+    --text-primary: #1c2826;
+    --brand-green: #1b4133;
+    --brand-sage: #3d9972;
+    --brand-light: #e1f2e9;
+  }
+
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Accessibility focus ring */
+  *:focus-visible {
+    outline: 3px solid #2d7c5b;
+    outline-offset: 3px;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f3efe8;
+}
+::-webkit-scrollbar-thumb {
+  background: #c5e5d4;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #99d1b6;
+}
+
+/* Glyph portal 3D perspective scene */
+.glyph-scene {
+  perspective: 1000px;
+  perspective-origin: center center;
+  transform-style: preserve-3d;
+}
