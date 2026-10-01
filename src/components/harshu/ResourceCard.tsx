@@ -210,8 +210,8 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
           </span>
         )}
 
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
-          <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-saffron-50 to-amber-50 text-amber-900 border border-amber-200 shadow-warm">
+          <Sparkles className="w-3.5 h-3.5 text-saffron-600" />
           <span>{getT(UI_TRANSLATIONS.harshuExplanationBadge, currentLanguage)}</span>
         </span>
 
@@ -224,11 +224,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
       </div>
 
       {/* Main Resource Card */}
-      <div className="bg-white border-2 border-harshu-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+      <div className="card-premium relative bg-white border-2 border-harshu-200 rounded-3xl p-6 sm:p-8 shadow-card hover:shadow-card-hover transition-shadow">
         {/* Title & Listen */}
         <div className="flex items-start justify-between gap-3 mb-2">
           <div>
-            <span className="text-xs font-semibold text-harshu-700 block mb-1">
+            <span className="text-xs font-semibold text-saffron-700 uppercase tracking-wide block mb-1">
               {dept}
             </span>
             <h1 className="text-xl sm:text-2xl font-extrabold text-harshu-950 leading-snug">
@@ -780,10 +780,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             <button
               type="button"
               onClick={onStartGuidedTask}
-              className="w-full py-4 px-6 bg-gradient-to-r from-harshu-800 to-harshu-900 hover:from-harshu-900 hover:to-harshu-950 text-white rounded-2xl text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+              className="relative w-full py-4 px-6 mic-hero-btn text-white rounded-2xl text-base sm:text-lg font-bold transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5 overflow-hidden group"
             >
-              <span>{primaryBtnLabel}</span>
-              <ArrowRight className="w-5 h-5 text-harshu-300" />
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
+              <span className="relative z-10">{primaryBtnLabel}</span>
+              <ArrowRight className="w-5 h-5 text-harshu-200 relative z-10" />
             </button>
           )}
 
@@ -854,9 +855,9 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
       </div>
 
       {/* CONVERSATIONAL FOLLOW-UP SECTION: Ask anything else with full context */}
-      <div className="mt-6 bg-white border-2 border-harshu-200 rounded-3xl p-5 sm:p-6 shadow-sm">
+      <div className="mt-6 bg-white border-2 border-harshu-200 rounded-3xl p-5 sm:p-6 shadow-card">
         <h3 className="text-sm font-bold text-harshu-950 mb-2 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-harshu-600" />
+          <Sparkles className="w-4 h-4 text-saffron-500" />
           <span>
             {currentLanguage === 'ta'
               ? 'அடுத்த சந்தேகம் அல்லது கேள்வி உள்ளதா?'

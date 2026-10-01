@@ -18,6 +18,7 @@ import {
   Landmark,
   Target,
   BookOpen,
+  ShieldCheck,
 } from 'lucide-react';
 import { speakText } from '../../utils/speech';
 import { ESSENTIAL_SERVICES, EssentialServiceItem } from '../../data/essentialServices';
@@ -54,6 +55,48 @@ export const HomeView: React.FC<HomeViewProps> = ({
         return BookOpen;
       default:
         return Landmark;
+    }
+  };
+
+  // Essential service card visual config per id
+  const getServiceCardStyle = (id: string) => {
+    switch (id) {
+      case 'services':
+        return {
+          gradient: 'bg-gradient-to-br from-emerald-50 via-white to-harshu-50',
+          border: 'border-emerald-200 hover:border-emerald-400',
+          iconGlow: 'icon-glow-green',
+          footerText: 'text-emerald-800',
+          arrowColor: 'text-emerald-600',
+          dotColor: 'bg-emerald-500',
+        };
+      case 'schemes':
+        return {
+          gradient: 'bg-gradient-to-br from-harshu-50 via-white to-saffron-50',
+          border: 'border-harshu-200 hover:border-harshu-400',
+          iconGlow: 'icon-glow-green',
+          footerText: 'text-harshu-800',
+          arrowColor: 'text-harshu-600',
+          dotColor: 'bg-harshu-500',
+        };
+      case 'skills':
+        return {
+          gradient: 'bg-gradient-to-br from-teal-50 via-white to-emerald-50',
+          border: 'border-teal-200 hover:border-teal-400',
+          iconGlow: 'icon-glow-teal',
+          footerText: 'text-teal-800',
+          arrowColor: 'text-teal-600',
+          dotColor: 'bg-teal-500',
+        };
+      default:
+        return {
+          gradient: 'bg-white',
+          border: 'border-earth-200',
+          iconGlow: '',
+          footerText: 'text-earth-700',
+          arrowColor: 'text-earth-500',
+          dotColor: 'bg-earth-400',
+        };
     }
   };
 
@@ -192,8 +235,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'காஞ்சிபுரத்துக்கு பேருந்து எங்கே கிடைக்கும்?',
       icon: Bus,
       badge: 'CMBT / SETC',
-      colorClass: 'bg-emerald-50/90 border-emerald-200 text-emerald-950 hover:bg-emerald-100/80',
-      iconBg: 'bg-emerald-600 text-white',
+      colorClass: 'bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200 text-emerald-950 hover:border-emerald-400',
+      iconBg: 'bg-emerald-600 text-white icon-glow-green',
     },
     {
       category: 'navigation' as IntentCategory,
@@ -214,8 +257,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'சென்னை சென்ட்ரலில் இருந்து பார்க் ஸ்டேஷன் போவது எப்படி?',
       icon: Navigation,
       badge: 'Maps & Walk',
-      colorClass: 'bg-teal-50/90 border-teal-200 text-teal-950 hover:bg-teal-100/80',
-      iconBg: 'bg-teal-600 text-white',
+      colorClass: 'bg-gradient-to-br from-teal-50 to-teal-100/50 border-teal-200 text-teal-950 hover:border-teal-400',
+      iconBg: 'bg-teal-600 text-white icon-glow-teal',
     },
     {
       category: 'booking' as IntentCategory,
@@ -236,7 +279,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'ரயில் டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?',
       icon: Train,
       badge: 'IRCTC / Indian Railways',
-      colorClass: 'bg-indigo-50/90 border-indigo-200 text-indigo-950 hover:bg-indigo-100/80',
+      colorClass: 'bg-gradient-to-br from-indigo-50 to-indigo-100/50 border-indigo-200 text-indigo-950 hover:border-indigo-400',
       iconBg: 'bg-indigo-600 text-white',
     },
     {
@@ -258,8 +301,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'சினிமா டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?',
       icon: Film,
       badge: 'BookMyShow',
-      colorClass: 'bg-amber-50/90 border-amber-200 text-amber-950 hover:bg-amber-100/80',
-      iconBg: 'bg-amber-600 text-white',
+      colorClass: 'bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200 text-amber-950 hover:border-amber-400',
+      iconBg: 'bg-amber-600 text-white icon-glow-saffron',
     },
     {
       category: 'cooking' as IntentCategory,
@@ -280,7 +323,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'சுவையான பிரியாணி செய்வது எப்படி?',
       icon: UtensilsCrossed,
       badge: "Let's Cook 🍳",
-      colorClass: 'bg-orange-50/90 border-orange-200 text-orange-950 hover:bg-orange-100/80',
+      colorClass: 'bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200 text-orange-950 hover:border-orange-400',
       iconBg: 'bg-orange-600 text-white',
     },
     {
@@ -302,7 +345,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'வாட்ஸ்அப் கணக்கு தொடங்குவது எப்படி?',
       icon: Smartphone,
       badge: 'Play Store',
-      colorClass: 'bg-sky-50/90 border-sky-200 text-sky-950 hover:bg-sky-100/80',
+      colorClass: 'bg-gradient-to-br from-sky-50 to-sky-100/50 border-sky-200 text-sky-950 hover:border-sky-400',
       iconBg: 'bg-sky-600 text-white',
     },
     {
@@ -324,7 +367,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'கரண்ட் பில் ஆன்லைனில் கட்டுவது எப்படி?',
       icon: CreditCard,
       badge: 'UPI / TANGEDCO',
-      colorClass: 'bg-rose-50/90 border-rose-200 text-rose-950 hover:bg-rose-100/80',
+      colorClass: 'bg-gradient-to-br from-rose-50 to-rose-100/50 border-rose-200 text-rose-950 hover:border-rose-400',
       iconBg: 'bg-rose-600 text-white',
     },
     {
@@ -346,8 +389,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'மாணவர்களுக்கான இலவசக் கல்வி உதவித்தொகை உள்ளதா?',
       icon: GraduationCap,
       badge: 'Verified .gov.in',
-      colorClass: 'bg-indigo-50/90 border-indigo-200 text-indigo-950 hover:bg-indigo-100/80',
-      iconBg: 'bg-indigo-600 text-white',
+      colorClass: 'bg-gradient-to-br from-violet-50 to-violet-100/50 border-violet-200 text-violet-950 hover:border-violet-400',
+      iconBg: 'bg-violet-600 text-white',
     },
     {
       category: 'location' as IntentCategory,
@@ -368,87 +411,101 @@ export const HomeView: React.FC<HomeViewProps> = ({
       prompt: 'Find hospitals near me',
       icon: MapPin,
       badge: 'Real Distance & Navigation',
-      colorClass: 'bg-emerald-50/90 border-emerald-200 text-emerald-950 hover:bg-emerald-100/80',
-      iconBg: 'bg-emerald-600 text-white',
+      colorClass: 'bg-gradient-to-br from-emerald-50 to-green-100/50 border-emerald-200 text-emerald-950 hover:border-emerald-400',
+      iconBg: 'bg-emerald-600 text-white icon-glow-green',
     },
   ];
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 animate-fade-in">
-      {/* Warm Greeting Card */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 bg-harshu-100/90 text-harshu-800 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-3 border border-harshu-200 shadow-xs">
-          <span>{greeting}</span>
-          <button
-            type="button"
-            onClick={handleListenGreeting}
-            className="p-1 text-harshu-700 hover:text-harshu-900 hover:bg-harshu-200 rounded-full transition-colors"
-            title="Listen aloud"
-            aria-label="Listen greeting aloud"
-          >
-            <Volume2 className="w-4 h-4" />
-          </button>
-        </div>
+      {/* ======================================================== */}
+      {/* WARM GREETING HERO                                        */}
+      {/* ======================================================== */}
+      <div className="relative overflow-hidden rounded-3xl mb-8 bg-gradient-to-br from-harshu-900 via-harshu-800 to-harshu-700 px-6 py-8 sm:px-10 sm:py-10 shadow-green">
+        {/* Decorative blobs inside hero */}
+        <div className="pointer-events-none absolute top-0 right-0 w-40 h-40 rounded-full bg-saffron-400/10 blur-2xl" />
+        <div className="pointer-events-none absolute bottom-0 left-0 w-48 h-48 rounded-full bg-harshu-400/10 blur-2xl" />
+        <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full bg-white/5 blur-xl" />
 
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-harshu-950 tracking-tight leading-tight">
-          {question}
-        </h1>
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center text-center">
+          {/* Greeting chip */}
+          <div className="welcome-chip inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-4 text-harshu-100 bg-white/10 border border-white/20 backdrop-blur-sm">
+            <span className="text-base">🌿</span>
+            <span>{greeting}</span>
+            <button
+              type="button"
+              onClick={handleListenGreeting}
+              className="p-1 text-harshu-200 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+              title="Listen aloud"
+              aria-label="Listen greeting aloud"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
-        <p className="text-sm sm:text-base text-earth-700 max-w-xl mx-auto mt-2 leading-relaxed">
-          {currentLanguage === 'ta'
-            ? 'பயணம், சினிமா டிக்கெட், சமையல் குறிப்பு, மின்சார கட்டணம், வாட்ஸ்அப் அல்லது அரசு திட்டங்கள் — எதையும் உங்கள் சொந்த மொழியில் கேளுங்கள்.'
-            : currentLanguage === 'hi'
-            ? 'यात्रा, सिनेमा टिकट, रसोई रेसिपी, बिजली बिल, व्हाट्सएप या सरकारी योजनाएं — कुछ भी अपनी भाषा में बेझिझक पूछें।'
-            : 'Travel, movie tickets, cooking, utility bills, phone apps, or government benefits — ask anything naturally in your own language.'}
-        </p>
-      </div>
+          {/* Main question */}
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight mb-3">
+            {question}
+          </h1>
 
-      {/* Hero Microphone Button */}
-      <div className="flex flex-col items-center justify-center my-6 sm:my-8">
-        <button
-          type="button"
-          onClick={onStartVoice}
-          className="group relative flex flex-col items-center justify-center w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-b from-harshu-700 to-harshu-900 text-white shadow-xl hover:shadow-2xl active:scale-95 transition-all transform hover:-translate-y-1 focus:ring-4 focus:ring-harshu-300"
-          aria-label={getT(UI_TRANSLATIONS.startSpeaking, currentLanguage)}
-        >
-          {/* Animated ripple circle */}
-          <div className="absolute inset-0 rounded-full bg-harshu-500 opacity-20 group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
-          <Mic className="w-10 h-10 sm:w-14 sm:h-14 text-harshu-200 group-hover:scale-110 transition-transform" />
-          <span className="text-xs sm:text-sm font-bold text-harshu-100 mt-1">
-            {getT(UI_TRANSLATIONS.startSpeaking, currentLanguage)}
-          </span>
-        </button>
+          <p className="text-sm sm:text-base text-harshu-200/90 max-w-xl leading-relaxed mb-6">
+            {currentLanguage === 'ta'
+              ? 'பயணம், சினிமா டிக்கெட், சமையல் குறிப்பு, மின்சார கட்டணம், வாட்ஸ்அப் அல்லது அரசு திட்டங்கள் — எதையும் உங்கள் சொந்த மொழியில் கேளுங்கள்.'
+              : currentLanguage === 'hi'
+              ? 'यात्रा, सिनेमा टिकट, रसोई रेसिपी, बिजली बिल, व्हाट्सएप या सरकारी योजनाएं — कुछ भी अपनी भाषा में बेझिझक पूछें।'
+              : 'Travel, movie tickets, cooking, utility bills, phone apps, or government benefits — ask anything naturally in your own language.'}
+          </p>
 
-        {/* Reassuring Microcopy */}
-        <p className="text-xs sm:text-sm text-harshu-900 font-semibold mt-3 text-center flex items-center gap-1.5 bg-harshu-50/80 px-3.5 py-1.5 rounded-full border border-harshu-200/70">
-          <span>🌿</span>
-          <span>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            {/* Hero Mic button */}
+            <button
+              type="button"
+              onClick={onStartVoice}
+              className="relative group flex items-center gap-3 px-8 py-4 bg-white text-harshu-900 rounded-2xl text-base font-extrabold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 overflow-hidden"
+              aria-label={getT(UI_TRANSLATIONS.startSpeaking, currentLanguage)}
+            >
+              {/* Shimmer */}
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-saffron-50 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600 pointer-events-none" />
+              {/* Pulse rings */}
+              <span className="relative flex items-center justify-center w-9 h-9">
+                <span className="absolute inset-0 rounded-full bg-harshu-200 animate-pulse-ring opacity-40" />
+                <span className="absolute inset-0 rounded-full bg-harshu-200 animate-pulse-ring opacity-40 animation-delay-800" />
+                <Mic className="w-5 h-5 text-harshu-800 relative z-10" />
+              </span>
+              <span className="relative z-10">{getT(UI_TRANSLATIONS.startSpeaking, currentLanguage)}</span>
+            </button>
+
+            {/* Type instead */}
+            <button
+              type="button"
+              onClick={onStartText}
+              className="flex items-center gap-2 px-5 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-2xl text-sm font-semibold backdrop-blur-sm transition-all"
+            >
+              <Keyboard className="w-4 h-4 text-harshu-200" />
+              <span>{getT(UI_TRANSLATIONS.typeInstead, currentLanguage)}</span>
+            </button>
+          </div>
+
+          {/* Reassuring microcopy */}
+          <p className="mt-4 text-xs text-harshu-300/80 font-medium">
             {currentLanguage === 'ta'
               ? 'தயங்காமல் பேசுங்கள். உங்கள் சொந்த தாய்மொழியை HARSHU புரிந்துகொள்ளும்.'
               : currentLanguage === 'hi'
               ? 'बिना झिझक बोलिए। HARSHU आपकी अपनी भाषा समझती है।'
               : 'Speak freely. HARSHU understands your mother tongue.'}
-          </span>
-        </p>
-
-        {/* Secondary: Type Instead */}
-        <button
-          type="button"
-          onClick={onStartText}
-          className="mt-3 text-xs sm:text-sm font-semibold text-earth-800 hover:text-harshu-900 flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-earth-100 transition-colors"
-        >
-          <Keyboard className="w-4 h-4 text-earth-600" />
-          <span>{getT(UI_TRANSLATIONS.typeInstead, currentLanguage)}</span>
-        </button>
+          </p>
+        </div>
       </div>
 
       {/* ======================================================== */}
-      {/* ESSENTIAL SERVICES HIGHLIGHT (3 Core Pillars)           */}
+      {/* ESSENTIAL SERVICES HIGHLIGHT (3 Core Pillars)            */}
       {/* ======================================================== */}
       <div className="mb-9">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3 px-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4 px-1">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-saffron-500 animate-pulse" />
             <h2 className="text-sm sm:text-base font-extrabold text-harshu-950 tracking-tight flex items-center gap-2">
               <span>
                 {currentLanguage === 'ta'
@@ -471,13 +528,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               ? 'தொடங்க ஏதேனும் ஒரு அட்டையை தட்டவும்'
               : currentLanguage === 'hi'
               ? 'शुरू करने के लिए किसी भी कार्ड को दबाएं'
-              : 'Tap any card to speak or guide with HARSHU'}
+              : 'Tap any card to start with HARSHU'}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {ESSENTIAL_SERVICES.map((item) => {
             const Icon = getServiceIcon(item.id);
+            const style = getServiceCardStyle(item.id);
             const titleText = item.title[currentLanguage] || item.title.en;
             const descText = item.description[currentLanguage] || item.description.en;
             const badgeText = item.badge[currentLanguage] || item.badge.en;
@@ -494,38 +552,42 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     onSelectCategory('scholarship', questionText);
                   }
                 }}
-                className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 transition-all flex flex-col justify-between ${item.accentClass} shadow-xs hover:shadow-md transform hover:-translate-y-1 active:scale-[0.98] group cursor-pointer`}
+                className={`essential-card card-premium w-full text-left p-5 sm:p-6 rounded-2xl border-2 flex flex-col justify-between ${style.gradient} ${style.border} shadow-card cursor-pointer`}
               >
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-xl sm:text-2xl">{item.iconEmoji}</span>
+                  {/* Card header */}
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl leading-none">{item.iconEmoji}</span>
                       <div
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center ${item.iconBg} shadow-xs group-hover:scale-105 transition-transform`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center ${item.iconBg} ${style.iconGlow} shadow-sm group-hover:scale-110 transition-transform`}
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="w-4.5 h-4.5" />
                       </div>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/95 text-earth-800 border border-earth-200/90 shadow-2xs">
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white border border-earth-200 text-earth-700 shadow-sm whitespace-nowrap">
                       {badgeText}
                     </span>
                   </div>
 
-                  <h3 className="font-extrabold text-sm sm:text-base text-harshu-950 mb-1 leading-snug group-hover:text-emerald-900 transition-colors">
+                  {/* Title */}
+                  <h3 className="font-extrabold text-sm sm:text-base text-harshu-950 mb-1.5 leading-snug">
                     {titleText}
                   </h3>
 
-                  <p className="text-xs text-earth-700 leading-relaxed mb-3">
+                  {/* Description */}
+                  <p className="text-xs text-earth-700 leading-relaxed mb-4">
                     {descText}
                   </p>
                 </div>
 
-                <div className="pt-2.5 border-t border-earth-200/70 flex items-center justify-between text-xs font-bold text-emerald-800 group-hover:text-emerald-950">
-                  <span className="line-clamp-1 italic text-[11px] opacity-90">
+                {/* Card footer */}
+                <div className={`pt-3 border-t border-earth-200/60 flex items-center justify-between ${style.footerText}`}>
+                  <span className="line-clamp-1 italic text-[11px] opacity-80 font-medium">
                     "{questionText}"
                   </span>
-                  <span className="ml-1 text-emerald-700 group-hover:translate-x-1 transition-transform">
-                    ➔
+                  <span className={`ml-2 font-bold text-base ${style.arrowColor} group-hover:translate-x-1 transition-transform`}>
+                    →
                   </span>
                 </div>
               </button>
@@ -534,10 +596,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </div>
 
-      {/* Inspiring Question Pills (Real Questions Users Ask) */}
+      {/* ======================================================== */}
+      {/* INSPIRING QUESTION PILLS                                  */}
+      {/* ======================================================== */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3 px-1">
-          <Sparkles className="w-4 h-4 text-harshu-700" />
+          <Sparkles className="w-4 h-4 text-saffron-500" />
           <h2 className="text-xs sm:text-sm font-bold text-harshu-900 uppercase tracking-wide">
             {currentLanguage === 'ta'
               ? 'எதையும் கேளுங்கள் (உதாரணங்கள்):'
@@ -554,9 +618,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => onSelectCategory(p.category, promptText)}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white/90 hover:bg-harshu-100/80 text-earth-900 text-xs sm:text-sm font-medium border border-earth-200/80 shadow-xs hover:border-harshu-400 hover:shadow-sm transition-all text-left"
+                className="sample-pill inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white hover:bg-harshu-50 text-earth-900 text-xs sm:text-sm font-medium border border-earth-200 shadow-sm hover:border-harshu-300 text-left"
               >
-                <span className="text-base">{p.icon}</span>
+                <span className="text-base leading-none">{p.icon}</span>
                 <span>{promptText}</span>
               </button>
             );
@@ -564,15 +628,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </div>
 
-      {/* Everyday Domains Grid */}
+      {/* ======================================================== */}
+      {/* EVERYDAY DOMAINS GRID                                     */}
+      {/* ======================================================== */}
       <div className="mt-8">
-        <h2 className="text-sm sm:text-base font-bold text-harshu-900 mb-3 px-1">
-          {currentLanguage === 'ta'
-            ? 'அல்லது உங்களுக்கு தேவையான துறையை தேர்ந்தெடுக்கலாம்:'
-            : currentLanguage === 'hi'
-            ? 'या अपनी जरूरत के अनुसार विषय चुनें:'
-            : 'Or explore by everyday need:'}
-        </h2>
+        <div className="flex items-center gap-2 mb-4 px-1">
+          <div className="w-1 h-4 rounded-full bg-gradient-to-b from-harshu-400 to-harshu-700" />
+          <h2 className="text-sm sm:text-base font-bold text-harshu-900">
+            {currentLanguage === 'ta'
+              ? 'அல்லது உங்களுக்கு தேவையான துறையை தேர்ந்தெடுக்கலாம்:'
+              : currentLanguage === 'hi'
+              ? 'या अपनी जरूरत के अनुसार विषय चुनें:'
+              : 'Or explore by everyday need:'}
+          </h2>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {domainCards.map((item, idx) => {
@@ -584,23 +653,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 key={`${item.category}-${idx}`}
                 type="button"
                 onClick={() => onSelectCategory(item.category, item.prompt)}
-                className={`w-full text-left p-4 sm:p-4.5 rounded-2xl border transition-all flex items-start gap-3.5 ${item.colorClass} shadow-xs hover:shadow-md transform hover:-translate-y-0.5 active:scale-[0.99]`}
+                className={`domain-card card-premium w-full text-left p-4 sm:p-5 rounded-2xl border transition-all flex items-start gap-3.5 ${item.colorClass} shadow-card`}
               >
                 <div
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-xs ${item.iconBg} mt-0.5`}
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${item.iconBg} mt-0.5`}
                 >
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1 mb-0.5">
+                  <div className="flex items-center justify-between gap-1 mb-1">
                     <h3 className="font-bold text-sm sm:text-base leading-snug">
                       {titleText}
                     </h3>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/80 border border-current opacity-70">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/80 border border-current opacity-70 whitespace-nowrap">
                       {item.badge}
                     </span>
                   </div>
-                  <p className="text-xs opacity-85 line-clamp-2 leading-relaxed">
+                  <p className="text-xs opacity-80 line-clamp-2 leading-relaxed">
                     {subText}
                   </p>
                 </div>
@@ -610,22 +679,38 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </div>
 
-      {/* Reassuring Philosophy Banner */}
-      <div className="mt-8 p-4 rounded-2xl bg-gradient-to-r from-harshu-50 to-earth-50 border border-harshu-200/80 text-center">
-        <p className="text-xs sm:text-sm font-semibold text-harshu-950">
+      {/* ======================================================== */}
+      {/* PHILOSOPHY FOOTER BANNER                                  */}
+      {/* ======================================================== */}
+      <div className="mt-8 relative overflow-hidden p-5 rounded-2xl bg-gradient-to-r from-harshu-50 via-white to-saffron-50 border border-harshu-200/60 text-center shadow-sm">
+        <div className="pointer-events-none absolute top-0 right-0 w-20 h-20 rounded-full bg-saffron-100/50 blur-2xl" />
+        <div className="pointer-events-none absolute bottom-0 left-0 w-16 h-16 rounded-full bg-harshu-100/50 blur-xl" />
+        <p className="text-xs sm:text-sm font-semibold text-harshu-950 relative z-10">
           {currentLanguage === 'ta'
             ? '💡 "தொழில்நுட்பம் உங்களை அறிய வேண்டும்; நீங்கள் தொழில்நுட்பத்தை அறிய வேண்டியதில்லை."'
             : currentLanguage === 'hi'
             ? '💡 "तकनीक को आपको समझना चाहिए — आपको तकनीक सीखने की मजबूरी नहीं होनी चाहिए।"'
             : '💡 "Technology should adapt to you — you do not need to adapt to technology."'}
         </p>
-        <p className="text-[11px] sm:text-xs text-earth-700 mt-1">
+        <p className="text-[11px] sm:text-xs text-earth-700 mt-1.5 relative z-10">
           {currentLanguage === 'ta'
             ? 'சரியான அரசு இணையதளம், பஸ் வழி, சினிமா புக் செய்வது அல்லது சமையல் — HARSHU பொறுமையாக வழிகாட்டும்.'
             : currentLanguage === 'hi'
             ? 'बस, ट्रेन, फिल्म टिकट, रसोई या सरकारी योजनाएं — HARSHU धैर्य से कदम दर कदम साथ देगा।'
             : 'Bus routes, movie tickets, cooking, or government schemes — HARSHU guides you step by step.'}
         </p>
+        {/* Trust badges */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2 relative z-10">
+          {[
+            { icon: ShieldCheck, label: '100% Safe', color: 'text-harshu-700' },
+            { icon: Sparkles, label: '13 Languages', color: 'text-saffron-600' },
+          ].map((b) => (
+            <div key={b.label} className="inline-flex items-center gap-1 text-[10px] font-semibold text-earth-700">
+              <b.icon className={`w-3 h-3 ${b.color}`} />
+              <span>{b.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -9,12 +9,23 @@
     --brand-green: #1b4133;
     --brand-sage: #3d9972;
     --brand-light: #e1f2e9;
+    --saffron: #f97d0b;
+    --saffron-light: #fff8ed;
+    --terracotta: #e25633;
+    --terracotta-light: #fdf4f0;
+    --rosegold: #e04a76;
+
+    /* Warm pattern radial */
+    --warm-glow: radial-gradient(ellipse at 20% 10%, #fff8ed 0%, transparent 55%),
+                 radial-gradient(ellipse at 80% 90%, #f2f9f5 0%, transparent 50%);
   }
 
   body {
     background-color: var(--bg-canvas);
     color: var(--text-primary);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Accessibility focus ring */
@@ -55,4 +66,265 @@
   perspective: 1000px;
   perspective-origin: center center;
   transform-style: preserve-3d;
+}
+
+/* =============================================
+   PREMIUM CARD STYLES
+   ============================================= */
+
+/* Warm shimmer effect on hover for premium cards */
+.card-premium {
+  position: relative;
+  overflow: hidden;
+}
+.card-premium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.55) 50%, transparent 65%);
+  background-size: 250% 100%;
+  background-position: -200% center;
+  transition: background-position 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.card-premium:hover::before {
+  background-position: 200% center;
+}
+
+/* Essential service card hover lift */
+.essential-card {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.22s ease,
+              border-color 0.2s ease;
+}
+.essential-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 36px -6px rgba(0,0,0,0.12), 0 4px 12px -3px rgba(0,0,0,0.07);
+}
+
+/* =============================================
+   WARM BACKGROUND PATTERN
+   ============================================= */
+.bg-warm-pattern {
+  background-color: #faf8f5;
+  background-image:
+    radial-gradient(ellipse at 15% 10%, rgba(249,125,11,0.06) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 85%, rgba(61,153,114,0.06) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(253,244,240,0.4) 0%, transparent 70%);
+}
+
+/* =============================================
+   DECORATIVE ELEMENTS
+   ============================================= */
+
+/* Kolam-inspired ring decoration */
+.deco-ring {
+  border: 2px dashed rgba(249,125,11,0.25);
+  border-radius: 50%;
+  animation: spin 20s linear infinite;
+}
+
+/* Floating dot decoration */
+.deco-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+/* =============================================
+   MIC BUTTON PULSING RINGS
+   ============================================= */
+.mic-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(61,153,114,0.4);
+  animation: pulseRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.mic-ring:nth-child(2) {
+  animation-delay: 0.8s;
+}
+.mic-ring:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* =============================================
+   SECTION LABEL PILL
+   ============================================= */
+.section-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid;
+}
+
+/* =============================================
+   GRADIENT TEXT
+   ============================================= */
+.text-gradient-warm {
+  background: linear-gradient(135deg, #1f4f3c 0%, #25634a 40%, #f97d0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-green {
+  background: linear-gradient(135deg, #0e241c 0%, #2d7c5b 60%, #3d9972 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* =============================================
+   PHILOSOPHY BANNER
+   ============================================= */
+.philosophy-banner {
+  background: linear-gradient(135deg, #1b4133 0%, #25634a 50%, #2d7c5b 100%);
+  position: relative;
+  overflow: hidden;
+}
+.philosophy-banner::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* =============================================
+   DOMAIN CARD
+   ============================================= */
+.domain-card {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.2s ease;
+}
+.domain-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(0,0,0,0.1);
+}
+
+/* =============================================
+   SAMPLE PILL HOVER
+   ============================================= */
+.sample-pill {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.sample-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0,0,0,0.1);
+}
+
+/* =============================================
+   HEADER GLOW
+   ============================================= */
+.header-brand-dot {
+  background: linear-gradient(135deg, #25634a, #1b4133);
+  box-shadow: 0 2px 8px rgba(27, 65, 51, 0.4);
+}
+
+/* =============================================
+   OPENING HERO
+   ============================================= */
+.opening-hero-bg {
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(249,125,11,0.07) 0%, transparent 45%),
+    radial-gradient(ellipse at 78% 80%, rgba(61,153,114,0.08) 0%, transparent 45%),
+    radial-gradient(ellipse at 55% 45%, rgba(255,255,255,0.6) 0%, transparent 55%),
+    #faf8f5;
+}
+
+/* Acronym strip glow */
+.acronym-strip {
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(197,229,212,0.6);
+  box-shadow: 0 2px 16px -4px rgba(31,79,60,0.12), 0 1px 4px -1px rgba(0,0,0,0.05);
+}
+
+/* Letter card in opening */
+.letter-card {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+}
+.letter-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px -4px rgba(0,0,0,0.1);
+}
+.letter-card.active {
+  background: linear-gradient(135deg, #f2f9f5 0%, #e1f2e9 100%);
+  border-color: #64b591;
+  box-shadow: 0 4px 16px -4px rgba(45,124,91,0.25), 0 0 0 3px rgba(100,181,145,0.2);
+}
+
+/* =============================================
+   ESSENTIAL SERVICE CARD ACCENTS
+   ============================================= */
+.service-card-services {
+  background: linear-gradient(135deg, #f0faf5 0%, #ffffff 50%, #fafff8 100%);
+  border-color: #a3d4bc;
+}
+.service-card-schemes {
+  background: linear-gradient(135deg, #f2f9f5 0%, #ffffff 50%, #fff8f2 100%);
+  border-color: #99d1b6;
+}
+.service-card-skills {
+  background: linear-gradient(135deg, #edfaf7 0%, #ffffff 50%, #f2faf8 100%);
+  border-color: #81c9b8;
+}
+
+/* Icon glow on service cards */
+.icon-glow-green {
+  box-shadow: 0 4px 12px rgba(45,124,91,0.3);
+}
+.icon-glow-teal {
+  box-shadow: 0 4px 12px rgba(20,184,166,0.3);
+}
+.icon-glow-saffron {
+  box-shadow: 0 4px 12px rgba(249,125,11,0.3);
+}
+
+/* =============================================
+   WELCOME CHIP
+   ============================================= */
+.welcome-chip {
+  background: linear-gradient(135deg, #e1f2e9 0%, #f2faf6 100%);
+  border: 1px solid rgba(100,181,145,0.4);
+  box-shadow: 0 1px 6px rgba(45,124,91,0.1);
+}
+
+/* =============================================
+   HERO MIC BUTTON
+   ============================================= */
+.mic-hero-btn {
+  background: linear-gradient(145deg, #25634a 0%, #1f4f3c 50%, #1b4133 100%);
+  box-shadow:
+    0 8px 32px -4px rgba(27,65,51,0.4),
+    0 2px 8px -2px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.mic-hero-btn:hover {
+  background: linear-gradient(145deg, #2d7c5b 0%, #25634a 50%, #1f4f3c 100%);
+  box-shadow:
+    0 12px 40px -4px rgba(27,65,51,0.45),
+    0 4px 12px -2px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.1);
 }
