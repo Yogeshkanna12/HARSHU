@@ -22,6 +22,79 @@ export interface VerifiedPortalEntry {
 // All URLs are real, official .gov.in / .nic.in or statutory government platforms.
 export const OFFICIAL_GOV_REGISTRY: VerifiedPortalEntry[] = [
   {
+    id: 'irctc-indian-railways',
+    category: 'services',
+    keywords: [
+      'train',
+      'railway',
+      'irctc',
+      'uts',
+      'rail',
+      'ரயில்',
+      'தொடர்வண்டி',
+      'ரயில்வே',
+      'ट्रेन',
+      'रेल',
+      'रेलवे',
+      'రైలు',
+      'ticket booking',
+      'pnr',
+      'reservation',
+      'rail ticket',
+      'train ticket',
+    ],
+    officialSourceName: 'Indian Railway Catering and Tourism Corporation (irctc.co.in)',
+    officialUrl: 'https://www.irctc.co.in',
+    sourceType: 'official',
+    domainHierarchy: 'Ministry of Railways, Government of India (.co.in / .gov.in)',
+    lastVerified: 'Active 2026',
+    title: {
+      ta: 'இந்திய ரயில்வே & ஐ.ஆர்.சி.டி.சி (Indian Railways / IRCTC)',
+      hi: 'भारतीय रेल एवं आईआरसीटीसी (Indian Railways / IRCTC)',
+      en: 'Indian Railways & IRCTC Official Portal (irctc.co.in)',
+      mr: 'भारतीय रेल्वे व आयआरसीटीसी (IRCTC)',
+      te: 'భారతీయ రైల్వే & ఐఆర్‌సిటిసి (IRCTC)',
+      kn: 'ಭಾರತೀಯ ರೈಲ್ವೆ ಮತ್ತು ಐಆರ್‌ಸಿಟಿಸಿ (IRCTC)',
+    },
+    department: {
+      ta: 'ரயில்வே அமைச்சகம், இந்திய அரசு',
+      hi: 'रेल मंत्रालय, भारत सरकार',
+      en: 'Ministry of Railways, Government of India',
+    },
+    whatItHelps: {
+      ta: 'ரயில்வே ஸ்டேஷனில் வரிசையில் நிற்காமல், ஐ.ஆர்.சி.டி.சி (IRCTC) செயலி அல்லது தளம் மூலம் இந்தியா முழுவதும் உள்ள ரயில்களுக்கு முன்பதிவு டிக்கெட் எடுக்க உதவுகிறது.',
+      hi: 'रेलवे काउंटर पर जाए बिना घर बैठे ऑनलाइन ट्रेन टिकट, तत्काल बुकिंग व PNR स्थिति जांचने की आधिकारिक सरकारी सेवा।',
+      en: 'Official government portal to book reserved train tickets, Tatkal bookings, and check PNR status across Indian Railways.',
+    },
+    whoItIsFor: {
+      ta: 'ரயில் பயணம் செய்ய விரும்பும் பொதுமக்கள், பெண்கள் மற்றும் குடும்பத்தினர்.',
+      hi: 'ट्रेन से यात्रा करने वाले सभी नागरिक ও परिवार।',
+      en: 'All citizens traveling across India by Indian Railways.',
+    },
+    eligibility: {
+      ta: [
+        'ஐ.ஆர்.சி.டி.சி கணக்கு (மொபைல் எண் மூலம் பதிவு செய்யலாம்).',
+        'புறப்படும் இடம் மற்றும் சென்று சேரும் இடம் விவரங்கள்.',
+        'பயணிகள் பெயர் மற்றும் வயது.',
+      ],
+      hi: [
+        'IRCTC अकाउंट (मोबाइल नंबर से तुरंत रजिस्ट्रेशन)।',
+        'प्रस्थान व गंतव्य स्टेशन तथा यात्रा की तारीख।',
+        'यात्रियों का नाम व उम्र।',
+      ],
+      en: [
+        'IRCTC account registration using valid mobile number.',
+        'Origin and destination stations with travel date.',
+        'Passenger names and age details.',
+      ],
+    },
+    documents: {
+      ta: ['அரசு அடையாள அட்டை (ஆதார் / வாக்காளர் அட்டை - பயணத்தின் போது காட்ட)', '10 இலக்க மொபைல் எண் (PNR டிக்கெட் SMS பெற)'],
+      hi: ['पहचान पत्र (आधार कार्ड - यात्रा के समय)', '10 अंकों का मोबाइल नंबर (PNR SMS प्राप्त करने हेतु)'],
+      en: ['Govt ID Proof (Aadhaar / Voter ID during journey)', 'Mobile number for PNR SMS'],
+    },
+  },
+  {
     id: 'national-scholarship-portal',
     category: 'scholarship',
     keywords: [

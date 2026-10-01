@@ -10,15 +10,15 @@ import {
   RefreshCw,
   Sparkles,
   AlertCircle,
-  Key,
   Globe,
 } from 'lucide-react';
 import { speakText, getLangCode, SUPPORTED_LANGUAGES } from '../../utils/speech';
-import { getGeminiApiKey, saveGeminiApiKey } from '../../utils/aiService';
+import { EssentialServiceItem } from '../../data/essentialServices';
 
 interface VoiceInteractionProps {
   currentLanguage: Language;
   initialMode?: 'voice' | 'text';
+  serviceContext?: EssentialServiceItem | null;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 }
@@ -26,6 +26,7 @@ interface VoiceInteractionProps {
 export const VoiceInteraction: React.FC<VoiceInteractionProps> = ({
   currentLanguage,
   initialMode = 'voice',
+  serviceContext,
   onSubmit,
   onCancel,
 }) => {
@@ -35,11 +36,17 @@ export const VoiceInteraction: React.FC<VoiceInteractionProps> = ({
   const [manualText, setManualText] = useState('');
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [micUnavailable, setMicUnavailable] = useState(false);
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
-  const [apiKey, setApiKey] = useState(getGeminiApiKey() || '');
   const [activeSpeechLang, setActiveSpeechLang] = useState<Language>(currentLanguage);
 
   const recognitionRef = useRef<any>(null);
+
+  // Vocalize context question when opened via Essential Services Highlight
+  useEffect(() => {
+    if (serviceContext) {
+      const q = serviceContext.question[currentLanguage] || serviceContext.question.en;
+      speakText(q, currentLanguage);
+    }
+  }, [serviceContext, currentLanguage]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -158,11 +165,6 @@ export const VoiceInteraction: React.FC<VoiceInteractionProps> = ({
     }, 450);
   };
 
-  const handleSaveKey = () => {
-    saveGeminiApiKey(apiKey);
-    setShowApiKeyInput(false);
-  };
-
   // Diverse multilingual sample questions (including user's exact scholarship prompt!)
   const multilingualSamples = [
     {
@@ -214,6 +216,42 @@ export const VoiceInteraction: React.FC<VoiceInteractionProps> = ({
       tag: 'Scholarship',
     },
     {
+      lang: 'en' as Language,
+      langLabel: 'English',
+      text: 'How do I book a train ticket?',
+      tag: '🚆 Train Ticket',
+    },
+    {
+      lang: 'ta' as Language,
+      langLabel: 'தமிழ் (Tamil)',
+      text: 'ரயில் டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?',
+      tag: '🚆 ரயில் டிக்கெட்',
+    },
+    {
+      lang: 'en' as Language,
+      langLabel: 'English',
+      text: 'How can I book a cinema ticket online?',
+      tag: '🎬 Cinema Ticket',
+    },
+    {
+      lang: 'ta' as Language,
+      langLabel: 'தமிழ் (Tamil)',
+      text: 'காஞ்சிபுரத்துக்கு பேருந்து எங்கே கிடைக்கும்?',
+      tag: '🚌 பேருந்து பயணம்',
+    },
+    {
+      lang: 'hi' as Language,
+      langLabel: 'हिन्दी (Hindi)',
+      text: 'ट्रेन टिकट ऑनलाइन कैसे बुक करें?',
+      tag: '🚆 ट्रेन टिकट',
+    },
+    {
+      lang: 'ta' as Language,
+      langLabel: 'தமிழ் (Tamil)',
+      text: 'சுவையான பிரியாணி செய்வது எப்படி?',
+      tag: '🍛 பிரியாணி',
+    },
+    {
       lang: 'ta' as Language,
       langLabel: 'Tanglish / Casual',
       text: 'College padikira students ku government la monthly scholarship ethavathu kedaikuma?',
@@ -241,17 +279,6 @@ export const VoiceInteraction: React.FC<VoiceInteractionProps> = ({
         </button>
 
         <div className="flex items-center gap-2">
-          {/* Optional Gemini API Key button */}
-          <button
-            type="button"
-            onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-            className="flex items-center gap-1 text-[11px] font-bold text-harshu-800 bg-harshu-100/90 px-2.5 py-1 rounded-xl border border-harshu-200 hover:bg-harshu-200 transition-colors"
-            title="Optional: Configure Gemini API Key"
-          >
-            <Key className="w-3 h-3 text-harshu-700" />
-            <span>{apiKey ? 'Gemini AI Active' : 'Gemini AI (Optional)'}</span>
-          </button>
-
           {/* Mode Switcher */}
           <div className="flex items-center gap-1 bg-earth-100 p-1 rounded-xl">
             <button
@@ -288,36 +315,61 @@ export const VoiceInteraction: React.FC<VoiceInteractionProps> = ({
         </div>
       </div>
 
-      {/* Optional Gemini Key Input Drawer */}
-      {showApiKeyInput && (
-        <div className="mb-5 p-4 bg-white rounded-2xl border border-harshu-300 shadow-sm animate-slide-up">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-harshu-900">
-              Gemini API Key (Optional for Cloud LLM, HARSHU works fully offline without it)
+      {/* ======================================================== */}
+      {/* ESSENTIAL SERVICE CONTEXT BANNER & COMMON SUGGESTIONS   */}
+      {/* ======================================================== */}
+      {serviceContext && (
+        <div className="mb-5 p-4 sm:p-5 bg-gradient-to-br from-emerald-50/95 via-harshu-50/90 to-white rounded-2xl border-2 border-emerald-300 shadow-sm animate-fade-in">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white text-emerald-950 border border-emerald-300 shadow-2xs">
+              <span className="text-base">{serviceContext.iconEmoji}</span>
+              <span>{serviceContext.title[currentLanguage] || serviceContext.title.en}</span>
             </span>
+
             <button
               type="button"
-              onClick={() => setShowApiKeyInput(false)}
-              className="text-xs text-earth-600 hover:text-earth-900"
+              onClick={() => {
+                const q = serviceContext.question[currentLanguage] || serviceContext.question.en;
+                speakText(q, currentLanguage);
+              }}
+              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-emerald-100 transition-colors"
+              title="Listen question aloud"
             >
-              ✕
+              <Volume2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">குரல் வழியே கேட்க (Listen)</span>
             </button>
           </div>
-          <div className="flex gap-2">
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter Gemini API key (optional)..."
-              className="flex-1 text-xs p-2 border border-earth-300 rounded-xl focus:outline-none focus:border-harshu-600"
-            />
-            <button
-              type="button"
-              onClick={handleSaveKey}
-              className="px-3 py-1 bg-harshu-800 text-white text-xs font-bold rounded-xl"
-            >
-              Save
-            </button>
+
+          <h2 className="text-base sm:text-lg font-extrabold text-harshu-950 leading-snug">
+            "{serviceContext.question[currentLanguage] || serviceContext.question.en}"
+          </h2>
+
+          <p className="text-xs text-earth-700 mt-1">
+            {currentLanguage === 'ta'
+              ? 'உங்கள் குரலில் பேசலாம், டைப் செய்யலாம் அல்லது கீழே உள்ள சேவையை தேர்வு செய்யலாம்:'
+              : currentLanguage === 'hi'
+              ? 'आप बोल सकती हैं, लिख सकती हैं या नीचे दिए गए विकल्पों को चुन सकती हैं:'
+              : 'Speak naturally, type your question, or tap any common service below:'}
+          </p>
+
+          {/* Quick Context-Specific Suggestion Chips */}
+          <div className="mt-3.5 pt-3 border-t border-emerald-200/80">
+            <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider block mb-2">
+              {currentLanguage === 'ta' ? 'அடிக்கடி கேட்கப்படும் சேவைகள்:' : currentLanguage === 'hi' ? 'लोकप्रिय विकल्प:' : 'Frequently requested:'}
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {serviceContext.suggestions.map((item, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => onSubmit(item.query)}
+                  className="p-2.5 bg-white/95 hover:bg-emerald-100/70 border border-emerald-200 hover:border-emerald-400 rounded-xl text-left text-xs font-semibold text-harshu-950 transition-all flex items-center justify-between group shadow-2xs"
+                >
+                  <span className="line-clamp-1">{item.label[currentLanguage] || item.label.en}</span>
+                  <span className="text-emerald-700 group-hover:translate-x-0.5 transition-transform text-xs font-bold ml-1">➔</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

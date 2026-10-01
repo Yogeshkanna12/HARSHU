@@ -8,8 +8,9 @@ import {
   ChatMessage,
 } from '../types/index';
 import { SUPPORTED_LANGUAGES } from './speech';
-import { matchUniversalResource } from './universalKnowledge';
+import { matchUniversalResource, UNIVERSAL_RESOURCES } from './universalKnowledge';
 import { discoverOfficialResource } from './resourceDiscovery';
+import { processLocationQuery } from './locationService';
 
 // Check if Gemini API key is available
 export function getGeminiApiKey(): string | null {
@@ -222,6 +223,47 @@ export const UNIVERSAL_DOMAIN_ANSWERS: Record<string, DomainAnswerTemplate> = {
       ta: ['தாம்பரம் செல்லும் லோக்கல் ரயில் டிக்கெட் விலை எவ்வளவு?', 'சுரங்கப்பாதையில் லக்கேஜ் எடுத்து செல்ல சாய்வுதளம் (Ramp) உள்ளதா?', 'மெட்ரோ ரயிலில் செல்ல முடியுமா?'],
       hi: ['ताम्बरम के लिए लोकल टिकट कितने का है?', 'क्या सबवे में सामान ले जाने के लिए रैंप है?', 'क्या मेट्रो से भी जा सकते हैं?'],
       en: ['How much is the local train ticket to Tambaram?', 'Is there a ramp for heavy luggage in the subway?', 'Can I take the Metro instead?'],
+    },
+  },
+
+  // Booking: Train Tickets (IRCTC / UTS Railway Booking)
+  'booking-train-ticket': {
+    taskType: 'booking',
+    mode: 'guided',
+    interpretedMeaning: {
+      ta: 'ரயில் டிக்கெட் ஆன்லைனில் எப்படி புக் செய்வது என்று அறிய விரும்புகிறீர்கள்.',
+      hi: 'आप जानना चाहती हैं कि ट्रेन टिकट ऑनलाइन कैसे बुक करें।',
+      en: 'You want to know how to book train tickets online step by step.',
+      mr: 'रेल्वे तिकीट ऑनलाइन कसे बुक करावे हे जाणून घ्यायचे आहे.',
+      gu: 'તમે જાણવા માંગો છો કે ટ્રેન ટિકિટ ઓનલાઇન કેવી રીતે બુક કરવી.',
+      te: 'రైలు టికెట్ ఆన్‌లైన్‌లో ఎలా బుక్ చేయాలో తెలుసుకోవాలనుకుంటున్నారు.',
+      kn: 'ರೈಲು ಟಿಕೆಟ್ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಹೇಗೆ ಬುಕ್ ಮಾಡುವುದು ಎಂದು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
+      ml: 'ട്രെയിൻ ടിക്കറ്റ് ഓൺലൈനിൽ എങ്ങനെ ബുക്ക് ചെയ്യാം എന്ന് അറിയാൻ ആഗ്രഹിക്കുന്നു.',
+      bn: 'অনলাইনে ট্রেনের টিকিট কীভাবে কাটবেন জানতে চান।',
+      pa: 'ਤੁਸੀਂ ਟ੍ਰੇਨ ਟਿਕਟ ਆਨਲਾਈਨ ਬੁੱਕ ਕਰਨ ਦਾ ਤਰੀਕਾ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ।',
+      or: 'ଅନଲାଇନରେ ଟ୍ରେନ ଟିକେଟ୍ କିପରି ବୁକ୍ କରିବେ ଜାଣିବାକୁ ଚାହୁଁଛନ୍ତି।',
+      as: 'অনলাইনত ৰেলৰ টিকট কেনেকৈ বুক কৰিব জানিব বিচাৰিছে।',
+      ur: 'آپ آن لائن ٹرین کا ٹکٹ بک کرنے کا طریقہ جاننا چاہتی ہیں۔',
+    },
+    directAnswer: {
+      ta: 'ரயில் டிக்கெட் ஆன்லைனில் புக் செய்வது மிகவும் எளிது! நீண்ட ரயில்வே கவுண்டர் வரிசையில் நிற்க வேண்டியதில்லை. ஐ.ஆர்.சி.டி.சி (IRCTC Rail Connect) செயலியில்: 1) உங்கள் ஊர் மற்றும் செல்லும் ஊர், பயண தேதியை தேர்வு செய்யுங்கள். 2) ஸ்லீப்பர் (SL) அல்லது 3AC வகுப்பில் இருக்கை உள்ள ரயிலை தேர்வு செய்யுங்கள். 3) பயணிகள் பெயர், வயது மற்றும் இருக்கை விருப்பத்தை உள்ளிடுங்கள். 4) கூகுள் பே அல்லது போன்பே மூலம் பாதுகாப்பாக கட்டணம் செலுத்துங்கள். 10 இலக்க PNR எண்ணுடன் கூடிய டிக்கெட் உடனடியாக உங்கள் போனுக்கு SMS-ஆக வந்துவிடும் — ரயிலில் பயணிக்க இந்த மெசேஜையும் அடையாள அட்டையையும் காட்டினாலே போதுமானது!',
+      hi: 'ट्रेन टिकट ऑनलाइन बुक करना बहुत आसान है! रेलवे स्टेशन की लंबी लाइन में खड़े होने की कोई जरूरत नहीं है। IRCTC Rail Connect ऐप में: 1) प्रस्थान और गंतव्य स्टेशन तथा यात्रा की तारीख चुनें। 2) स्लीपर (SL) या 3AC डिब्बे में उपलब्ध ट्रेन चुनें। 3) यात्री का नाम, उम्र और सीट पसंद दर्ज करें। 4) Google Pay या PhonePe से सुरक्षित भुगतान करें। आपका 10 अंकों का PNR कन्फर्म टिकट तुरंत SMS व WhatsApp पर मिल जाएगा — ट्रेन में सिर्फ यह मैसेज और आधार कार्ड दिखाना काफी है!',
+      en: 'Booking train tickets online is very easy and convenient! There is no need to wait in long station counter lines. Using the official IRCTC Rail Connect app: 1) Enter your departure and arrival stations and travel date. 2) Select your preferred train and class (Sleeper SL, 3AC, or 2S) with green available seats. 3) Add passenger names, ages, and berth preference (Lower/Middle/Upper). 4) Pay securely via UPI (Google Pay, PhonePe) or Debit Card. Your confirmed 10-digit PNR ticket arrives immediately on SMS and WhatsApp — simply show this SMS and your ID card to the ticket examiner (TTE) on the train!',
+      mr: 'IRCTC ॲपवरून सहज रेल्वे तिकीट बुक करू शकता: स्थानके आणि तारीख निवडा, स्लीपर किंवा 3AC क्लास निवडा, प्रवाशांची माहिती भरा आणि UPI द्वारे पेमेंट करा. PNR तिकीट थेट मोबाईलवर SMS द्वारे येईल.',
+      gu: 'IRCTC એપ દ્વારા સરળતાથી ટ્રેન ટિકિટ બુક કરી શકો છો: સ્ટેશન અને તારીખ પસંદ કરો, સ્લીપર અથવા 3AC પસંદ કરો અને Google Pay થી પેમેન્ટ કરો. PNR કન્ફર્મેશન તમારા ફોન પર આવી જશે.',
+      te: 'IRCTC యాప్ ద్వారా సులభంగా రైలు టికెట్ బుక్ చేసుకోవచ్చు: స్టేషన్లు, తేదీ ఎంచుకోండి, స్లీపర్ లేదా 3AC ఎంచుకుని వివరాలు నమోదు చేసి UPI ద్వారా చెల్లించండి. PNR నంబర్ SMS వస్తుంది.',
+      kn: 'IRCTC ಆಪ್ ಮೂಲಕ ಸುಲಭವಾಗಿ ರೈಲು ಟಿಕೆಟ್ ಬುಕ್ ಮಾಡಬಹುದು: ನಿಲ್ದಾಣ ಮತ್ತು ದಿನಾಂಕ ಆಯ್ಕೆಮಾಡಿ, ಸ್ಲೀಪರ್ ಅಥವಾ 3AC ಆಯ್ಕೆಮಾಡಿ ಮತ್ತು UPI ಮೂಲಕ ಪಾವತಿಸಿ. PNR ನಂಬರ್ ತಕ್ಷಣ ನಿಮ್ಮ ಫೋನ್‌ಗೆ ಬರುತ್ತದೆ.',
+      ml: 'IRCTC ആപ്പ് വഴി എളുപ്പത്തിൽ ട്രെയിൻ ടിക്കറ്റ് ബുക്ക് ചെയ്യാം. സ്റ്റേഷനും തീയതിയും സ്ലീപ്പർ/3AC ക്ലാസും തെരഞ്ഞെടുത്ത് ഗൂഗിൾ പേ വഴി പണമടയ്ക്കാം. PNR എസ്എംഎസ് ഫോണിൽ ലഭിക്കും.',
+      bn: 'IRCTC অ্যাপ থেকে সহজে ট্রেনের টিকিট কাটা যায়: স্টেশন ও তারিখ বেছে নিন, স্লিপার বা 3AC সিলেক্ট করুন এবং UPI দিয়ে পেমেন্ট করুন। 10 সংখ্যার PNR মোবাইলে চলে আসবে।',
+      pa: 'IRCTC ਐਪ ਰਾਹੀਂ ਆਸਾਨੀ ਨਾਲ ਟ੍ਰੇਨ ਟਿਕਟ ਬੁੱਕ ਕਰੋ: ਸਟੇਸ਼ਨ ਅਤੇ ਮਿਤੀ ਚੁਣੋ, ਸਲੀਪਰ ਜਾਂ 3AC ਚੁਣੋ ਅਤੇ UPI ਰਾਹੀਂ ਭੁਗਤਾਨ ਕਰੋ। PNR ਨੰਬਰ ਤੁਹਾਡੇ ਫ਼ੋਨ ਤੇ ਆ ਜਾਵੇਗਾ।',
+      or: 'IRCTC ଆପ୍ ମାଧ୍ୟମରେ ସହଜରେ ଟ୍ରେନ ଟିକେଟ୍ ବୁକ୍ କରିପାରିବେ। ଷ୍ଟେସନ ଓ ତାରିଖ ବାଛି, ସ୍ଲିପର ବା 3AC ବାଛି UPI ରେ ପେମେଣ୍ଟ କରନ୍ତୁ। PNR ମୋବାଇଲକୁ ଆସିବ।',
+      as: 'IRCTC এপৰ পৰা সহজে ৰেলৰ টিকট বুক কৰিব পাৰি: ষ্টেচন আৰু তাৰিখ বাছি লওক, শ্লীপাৰ বা 3AC বাছি UPI-ৰে পেমেন্ট কৰক। PNR টিকট ফোনলৈ আহিব।',
+      ur: 'IRCTC ایپ کے ذریعے باآسانی ٹرین کا ٹکٹ بک کیا جا سکتا ہے: روانگی اور منزل کا اسٹیشن اور تاریخ منتخب کریں، سلیپر یا 3AC منتخب کریں اور UPI کے ذریعے ادائیگی کریں۔ 10 ہندسوں کا PNR ایس ایم ایس پر آ جائے گا۔',
+    },
+    followupSuggestions: {
+      ta: ['பெண்களுக்கான மகளிர் கோட்டாவில் (Ladies Quota) புக் செய்வது எப்படி?', 'தட்கல் (Tatkal) டிக்கெட் எடுக்கும் நேரம் என்ன?', 'லோக்கல் ரயில் டிக்கெட் எடுக்க UTS செயலியை பயன்படுத்துவது எப்படி?'],
+      hi: ['लेडीज कोटा में महिलाओं के लिए टिकट कैसे लें?', 'तत्काल टिकट बुकिंग का समय क्या है?', 'लोकल ट्रेन के लिए UTS ऐप कैसे चलाएं?'],
+      en: ['How to book tickets in Ladies Quota for women travelers?', 'What are the Tatkal booking timings?', 'How to use UTS app for local trains?'],
     },
   },
 
@@ -465,6 +507,129 @@ export const UNIVERSAL_DOMAIN_ANSWERS: Record<string, DomainAnswerTemplate> = {
       ur: 'پودے سورج کی روشنی، پانی اور ہوا کی مدد سے اپنی غذا تیار کرتے ہیں اور ہمیں زندہ رہنے کے لیے آکسیجن فراہم کرتے ہیں۔',
     },
   },
+
+  // Government Certificates (Income, Community, Nativity, e-Sevai)
+  'service-government-certificate': {
+    taskType: 'government',
+    mode: 'guided',
+    interpretedMeaning: {
+      ta: 'வருமானம், சாதி, இருப்பிடம் போன்ற அரசு சான்றிதழ்களை இ-சேவை மூலம் எவ்வாறு விண்ணப்பிப்பது என்று அறிய விரும்புகிறீர்கள்.',
+      hi: 'आप जानना चाहती हैं कि आय, जाति या निवास प्रमाण पत्र के लिए ई-सेवा या ऑनलाइन कैसे आवेदन करें।',
+      en: 'You want to know how to apply for government revenue certificates (Income, Community, Nativity) via e-Sevai or online.',
+      mr: 'उत्पन्न, जात किंवा रहिवासी प्रमाणपत्र ई-सेवा केंद्राद्वारे कसे मिळवावे हे जाणून घ्यायचे आहे.',
+      gu: 'તમે આવક, જાતિ અથવા રહેઠાણના સરકારી પ્રમાણપત્ર માટે કેવી રીતે અરજી કરવી તે જાણવા માંગો છો.',
+      te: 'ఆదాయ, కుల, నివాస ధ్రువీకరణ పత్రాల కోసం ఈ-సేవ ద్వారా ఎలా దరఖాస్తు చేసుకోవాలో తెలుసుకోవాలనుకుంటున్నారు.',
+      kn: 'ಆದಾಯ, ಜಾತಿ ಅಥವಾ ವಾಸಸ್ಥಳ ಪ್ರಮಾಣಪತ್ರವನ್ನು ಇ-ಸೇವೆ ಮೂಲಕ ಹೇಗೆ ಪಡೆಯುವುದು ಎಂದು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
+      ml: 'വരുമാനം, ജാതി, വാസസ്ഥലം എന്നിവയുടെ സർക്കാർ സർട്ടിഫിക്കറ്റിനായി എങ്ങനെ അപേക്ഷിക്കാമെന്ന് അറിയണം.',
+      bn: 'ইনকাম, কাস্ট বা রেসিডেন্সিয়াল সার্টিফিকেটের জন্য কীভাবে আবেদন করবেন জানতে চান।',
+      pa: 'ਆਮਦਨ, ਜਾਤੀ ਜਾਂ ਰਿਹਾਇਸ਼ੀ ਸਰਟੀਫਿਕੇਟ ਕਿਵੇਂ ਅਪਲਾਈ ਕਰਨਾ ਹੈ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ।',
+      or: 'ଆୟ, ଜାତି ବା ବାସସ୍ଥାନ ପ୍ରମାଣପତ୍ର କିପରି ଆବେଦନ କରିବେ ଜାଣିବାକୁ ଚାହୁଁଛନ୍ତି।',
+      as: 'উপাৰ্জন, জাতি বা বাসস্থানৰ প্ৰমাণপত্ৰৰ বাবে কেনেকৈ আবেদন কৰিব জানিব বিচাৰিছে।',
+      ur: 'آپ جاننا چاہتی ہیں کہ آمدنی، ذات یا رہائشی سرٹیفکیٹ کے لیے ای-سیوا یا آن لائن کیسے درخواست دیں۔',
+    },
+    directAnswer: {
+      ta: 'அரசு சான்றிதழ்கள் (வருமானச் சான்றிதழ், சாதிச் சான்றிதழ், இருப்பிடச் சான்றிதழ், முதல் பட்டதாரி சான்றிதழ்) பெற விண்ணப்பிப்பது மிகவும் எளிது:\n1. உங்கள் ஆதார் அட்டை, ஸ்மார்ட் ரேஷன் கார்டு மற்றும் பாஸ்போர்ட் அளவு போட்டோவை தயாராக வையுங்கள்.\n2. உங்கள் ஊரில் உள்ள அரசு அங்கீகாரம் பெற்ற இ-சேவை (e-Sevai) மையம் செல்லுங்கள் அல்லது tnesevai.tn.gov.in போர்ட்டலில் பதிவு செய்யுங்கள்.\n3. இ-சேவை மைய ஆப்பரேட்டர் ஆவணங்களை ஸ்கேன் செய்து சமர்ப்பிப்பார். உங்கள் மொபைல் எண்ணிற்கு விண்ணப்ப ஒப்புகை எண் (Reference ID) SMS-ஆக வரும்.\n4. வட்டாட்சியர் (Tahsildar) ஒப்புதல் அளித்ததும், அரசு முத்திரையிடப்பட்ட டிஜிட்டல் சான்றிதழை நீங்கள் அங்கேயே பதிவிறக்கம் செய்து கொள்ளலாம். HARSHU உங்களுக்கு விண்ணப்பிக்கும் வழியை தெளிவாக காட்டும்!',
+      hi: 'सरकारी प्रमाण पत्र (आय प्रमाण पत्र, जाति प्रमाण पत्र, निवास प्रमाण पत्र) बनवाने की प्रक्रिया बहुत सरल है:\n1. अपना आधार कार्ड, स्मार्ट राशन कार्ड और पासपोर्ट साइज फोटो तैयार रखें।\n2. नजदीकी सरकारी ई-सेवा (e-Sevai / CSC) केंद्र जाएं या आधिकारिक पोर्टल (tnesevai.tn.gov.in) पर आवेदन करें।\n3. ऑपरेटर दस्तावेजों को स्कैन कर फॉर्म जमा करेगा और आपके फोन पर आवेदन संदर्भ संख्या (Application ID) का SMS आएगा।\n4. राजस्व अधिकारी (तहसीलदार) की मंजूरी के बाद डिजिटल हस्ताक्षरित प्रमाण पत्र ऑनलाइन तैयार हो जाएगा। HARSHU आपको पूरी प्रक्रिया में सहायता करेगा!',
+      en: 'Applying for government revenue certificates (Income, Community, Nativity, First Graduate) is straightforward:\n1. Keep the applicant’s Aadhaar card copy, Smart Ration Card, and a recent passport-size photograph ready.\n2. Visit your nearest authorized e-Sevai (Citizen Service) Centre or register online on the official portal (tnesevai.tn.gov.in).\n3. The operator will scan your documents and submit the application. You will receive an SMS containing your Application Tracking Reference ID.\n4. Once verified and approved by the Tahsildar / Revenue Department, your digitally signed certificate can be printed immediately. HARSHU will guide you step by step!',
+      mr: 'उत्पन्न, जात व रहिवासी प्रमाणपत्रासाठी: आधार कार्ड, राशन कार्ड व फोटो घेऊन जवळच्या ई-सेवा केंद्रात जा. अर्ज भरल्यानंतर मिळणाऱ्या पावती क्रमांकावरून (Application ID) प्रमाणपत्र डाऊनलोड करू शकता.',
+      gu: 'સરકારી આવક કે જાતિના પ્રમાણપત્ર માટે આધાર કાર્ડ અને રેશન કાર્ડ સાથે નજીકના ઈ-સેવા કેન્દ્ર પર જાઓ. અરજી સબમિટ થયા પછી SMS માં આવેલ એપ્લિકેશન નંબર દ્વારા પ્રમાણપત્ર મેળવી શકાય છે.',
+      te: 'ఆదాయ, కుల, నివాస ధ్రువీకరణ పత్రాల కోసం: ఆధార్ కార్డు, రేషన్ కార్డు మరియు ఫోటోతో సమీపంలోని ఈ-సేవ కేంద్రానికి వెళ్లండి. తహశీల్దార్ ఆమోదం పొందిన తర్వాత డిజిటల్ సర్టిఫికేట్ డౌన్‌లోడ్ చేసుకోవచ్చు.',
+      kn: 'ಆದಾಯ, ಜಾತಿ ಮತ್ತು ವಾಸಸ್ಥಳ ಪ್ರಮಾಣಪತ್ರ ಪಡೆಯಲು: ಆಧಾರ್ ಕಾರ್ಡ್, ರೇಷನ್ ಕಾರ್ಡ್ ಮತ್ತು ಫೋಟೋದೊಂದಿಗೆ ಸಮೀಪದ ಇ-ಸೇವಾ ಕೇಂದ್ರಕ್ಕೆ ಭೇಟಿ ನೀಡಿ. ಅನುಮೋದನೆಯ ನಂತರ ಡಿಜಿಟಲ್ ಪ್ರಮಾಣಪತ್ರ ಲಭ್ಯವಾಗುತ್ತದೆ.',
+      ml: 'വരുമാന, ജാതി, വാസസ്ഥല സർട്ടിഫിക്കറ്റുകൾക്കായി: ആധാർ കാർഡും റേഷൻ കാർഡുമായി അടുത്തുള്ള അക്ഷയ/ഇ-സേവാ കേന്ദ്രത്തിൽ അപേക്ഷിക്കുക. അംഗീകാരം ലഭിച്ച ശേഷം ഡിജിറ്റൽ സർട്ടിഫിക്കറ്റ് ലഭിക്കും.',
+      bn: 'ইনকাম, কাস্ট বা রেসিডেন্সিয়াল সার্টিফিকেটের জন্য আধার কার্ড, রেশন কার্ড ও ছবি নিয়ে নিকটস্থ ই-সেবা কেন্দ্রে যান। আবেদন জমার পর প্রাপ্ত রেফারেন্স নম্বর দিয়ে সার্টিফিকেট ডাউনলোড করতে পারবেন।',
+      pa: 'ਆਮਦਨ ਜਾਂ ਜਾਤੀ ਸਰਟੀਫਿਕੇਟ ਲਈ: ਆਧਾਰ ਕਾਰਡ ਅਤੇ ਰਾਸ਼ਨ ਕਾਰਡ ਨਾਲ ਨੇੜਲੇ ਸੇਵਾ ਕੇਂਦਰ ਜਾਓ। ਤਸਦੀਕ ਤੋਂ ਬਾਅਦ ਡਿਜੀਟਲ ਸਰਟੀਫਿਕੇਟ ਮਿਲ ਜਾਵੇਗਾ।',
+      or: 'ଆୟ ବା ଜାତି ପ୍ରମାଣପତ୍ର ପାଇଁ: ଆଧାର କାର୍ଡ ଓ ରାସନ କାର୍ଡ ନେଇ ନିକଟସ୍ଥ ଇ-ସେବା କେନ୍ଦ୍ରକୁ ଯାଆନ୍ତୁ। ଅନୁମୋଦନ ପରେ ଡିଜିଟାଲ ପ୍ରମାଣପତ୍ର ମିଳିବ।',
+      as: 'উপাৰ্জন বা জাতিৰ প্ৰমাণপত্ৰৰ বাবে: আধাৰ কাৰ্ড আৰু ৰেচন কাৰ্ড লৈ ওচৰৰ ই-সেৱা কেন্দ্ৰলৈ যাওক। অনুমোদনৰ পাছত প্ৰমাণপত্ৰ ডাউনলোড কৰিব পাৰিব।',
+      ur: 'آمدنی، ذات یا رہائشی سرٹیفکیٹ حاصل کرنے کا طریقہ: اپنا آدھار کارڈ، راشن کارڈ اور تصویر لے کر قریبی ای-سیوا مرکز جائیں۔ تصدیق کے بعد باآسانی ڈیجیٹل سرٹیفکیٹ حاصل کیا جا سکتا ہے۔',
+    },
+    followupSuggestions: {
+      ta: ['வருமானச் சான்றிதழ் பெற என்னென்ன ஆவணங்கள் தேவை?', 'சான்றிதழ் கிடைக்க எத்தனை நாட்கள் ஆகும்?', 'அருகிலுள்ள இ-சேவை மையம் எங்குள்ளது?'],
+      hi: ['आय प्रमाण पत्र के लिए कौन से दस्तावेज चाहिए?', 'प्रमाण पत्र बनने में कितने दिन लगते हैं?', 'नजदीकी ई-सेवा केंद्र कहाँ है?'],
+      en: ['What documents are required for Income Certificate?', 'How many days does it take to get the certificate?', 'Where is the nearest e-Sevai centre?'],
+    },
+  },
+
+  // Free Skill Learning (Tailoring, Computer, Beautician, Handicrafts)
+  'skills-learn-free': {
+    taskType: 'government',
+    mode: 'guided',
+    interpretedMeaning: {
+      ta: 'அரசாங்கத்தின் சார்பில் முற்றிலும் இலவசமாக என்னென்ன தொழிற்பயிற்சிகள் மற்றும் திறன்கள் கற்றுக்கொள்ளலாம் என அறிய விரும்புகிறீர்கள்.',
+      hi: 'आप जानना चाहती हैं कि सरकार द्वारा महिलाओं को कौन से व्यावसायिक हुनर और कौशल मुफ्त सिखाए जाते हैं।',
+      en: 'You want to know what skills and vocational courses you can learn completely for free under government initiatives.',
+      mr: 'शासनाकडून महिलांसाठी कोणते व्यावसायिक कौशल्य कोर्सेस मोफत उपलब्ध आहेत हे जाणून घ्यायचे आहे.',
+      gu: 'તમે જાણવા માંગો છો કે સરકાર દ્વારા કયા કૌશલ્યો અને તાલીમ મફતમાં શીખવવામાં આવે છે.',
+      te: 'ప్రభుత్వం అందించే ఉచిత వృత్తి నైపుణ్య శిక్షణలు మరియు కోర్సుల వివరాలు తెలుసుకోవాలనుకుంటున్నారు.',
+      kn: 'ಸರ್ಕಾರದಿಂದ ಉಚಿತವಾಗಿ ಯಾವ ವೃತ್ತಿಪರ ಕೌಶಲ್ಯಗಳನ್ನು ಕಲಿಯಬಹುದು ಎಂದು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
+      ml: 'സർക്കാർ സൗജന്യമായി നൽകുന്ന തൊഴിൽ പരിശീലനങ്ങളും കോഴ്സുകളും ഏതെല്ലാമാണെന്ന് അറിയണം.',
+      bn: 'সরকারের পক্ষ থেকে বিনামূল্যে কী কী বৃত্তিমূলক কাজ শেখা যায় তা জানতে চান।',
+      pa: 'ਤੁਸੀਂ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ ਕਿ ਸਰਕਾਰ ਵੱਲੋਂ ਕਿਹੜੇ ਹੁਨਰ ਮੁਫ਼ਤ ਸਿਖਾਏ ਜਾਂਦੇ ਹਨ।',
+      or: 'ସରକାରଙ୍କ ଦ୍ୱାରା ମାଗଣାରେ କେଉଁ କୌଶଳ ବା ଧନ୍ଦାମୂଳକ ତାଲିମ ଶିଖିପାରିବେ ଜାଣିବାକୁ ଚାହୁଁଛନ୍ତି।',
+      as: 'চৰকাৰৰ ফালৰ পৰা কি কি কাৰিকৰী দক্ষতা বিনামূলীয়াকৈ শিকিব পাৰি জানিব বিচাৰিছে।',
+      ur: 'آپ جاننا چاہتی ہیں کہ حکومت کے تحت کون سے ہنر اور کورسز بالکل مفت سیکھے جا سکتے ہیں۔',
+    },
+    directAnswer: {
+      ta: 'அரசாங்கத்தின் தமிழ்நாடு திறன் மேம்பாட்டுக் கழகம் (TNSDC) மற்றும் மத்திய திறன் இயக்கம் (PMKVY) மூலமாக நீங்கள் முற்றிலும் இலவசமாக பின்வரும் பயனுள்ள திறன்களைக் கற்கலாம்:\n1. **தையல் கலை & ஆடை வடிவமைப்பு (Tailoring)**: நவீன தையல் பயிற்சி மற்றும் சத்யவாணி முத்து அம்மையார் திட்டம் மூலம் இலவச தையல் இயந்திரம் பெற்று வீட்டில் இருந்தே சம்பாதிக்கலாம்.\n2. **அடிப்படை கணினி & டிஜிட்டல் அறிவு (Computer & Phone Skills)**: MS Office, தட்டச்சு, மற்றும் இணைய பயன்பாட்டு பயிற்சி.\n3. **அழகுக்கலை & ஆரோக்கியம் (Beautician & Wellness)**: தொழில்முறை பிரைடல் மேக்கப் மற்றும் அழகு நிலைய பயிற்சி.\n4. **கைவினைப் பொருட்கள் & சணல் பை தயாரிப்பு (Handicrafts)**: கைவினைப் பொருட்கள் மற்றும் சிறுதொழில் பயிற்சி.\nஇப்பயிற்சிகள் அனைத்திற்கும் கட்டணம் ஏதுமில்லை, இலவச உபகரணங்கள் மற்றும் அரசு சான்றிதழும் வழங்கப்படுகிறது. HARSHU உங்களுக்கு விண்ணப்பிக்க வழிகாட்டும்!',
+      hi: 'सरकारी कौशल विकास अभियानों (TNSDC व PMKVY) के तहत महिलाएं ये उपयोगी हुनर बिल्कुल मुफ्त सीख सकती हैं:\n1. **सिलाई व फैशन डिजाइनिंग**: आधुनिक सिलाई प्रशिक्षण व मुफ्त सिलाई मशीन सहायता, जिससे आप घर से कमाई कर सकें।\n2. **बेसिक कंप्यूटर व डिजिटल साक्षरता**: कंप्यूटर टाइपिंग, MS Office और ऑनलाइन कार्य का ज्ञान।\n3. **ब्यूटीशियन कोर्स**: ब्यूटी पार्लर और मेकअप का पेशेवर प्रशिक्षण।\n4. **हस्तशिल्प व बैग निर्माण**: जूट बैग, कढ़ाई और घरेलू सजावटी कला।\nइन सभी प्रशिक्षणों में कोई फीस नहीं लगती, साथ ही राष्ट्रीय स्तर पर मान्य सरकारी प्रमाण पत्र मिलता है। HARSHU आपको पंजीकरण का तरीका बताएगा!',
+      en: 'You can learn several high-demand vocational skills completely for free under government skill missions (TNSDC & PMKVY):\n1. **Tailoring & Garment Making**: Free certified stitching and pattern-making courses with toolkit/sewing machine assistance to earn from home.\n2. **Basic Computer & Digital Skills**: MS Office, keyboard typing, internet navigation, and digital financial literacy.\n3. **Beautician & Personal Wellness**: Professional bridal styling, skin care, and salon management courses.\n4. **Handicrafts & Artisan Crafts**: Jute bag fabrication, embroidery, and home decorative craft courses.\nAll these courses are 100% free of cost, include practical training materials, and award recognized government certificates. HARSHU will guide you to enroll step by step!',
+      mr: 'शासकीय कौशल्य अभियानांतर्गत मोफत कोर्सेस: १) मोफत शिलाई व फॅशन डिझायनिंग, २) बेसिक कॉम्प्युटर व टायपिंग, ३) ब्युटीशियन कोर्स, ४) हस्तकला व गृहउद्योग. हे सर्व कोर्सेस मोफत असून शासकीय प्रमाणपत्र मिळते.',
+      gu: 'સરકારી યોજનાઓ હેઠળ મફત શીખી શકાય તેવા કૌશલ્યો: ૧) સિલાઈ અને કટિંગ તાલીમ, ૨) બેસિક કમ્પ્યુટર જ્ઞાન, ૩) બ્યુટિશિયન કોર્સ, ૪) હસ્તકલા અને ગૃહ ઉદ્યોગ. કોઈ ફી નથી અને સરકારી સર્ટિફિકેટ મળે છે.',
+      te: 'ప్రభుత్వ ఉచిత శిక్షణలు: 1) ఉచిత కుట్టు పని మరియు టైలరింగ్, 2) బేసిక్ కంప్యూటర్ మరియు టైపింగ్, 3) బ్యూటీషియన్ కోర్సు, 4) హస్తకళలు మరియు చేతివృత్తులు. ఎటువంటి ఫీజు లేకుండా ప్రభుత్వ సర్టిఫికెట్ లభిస్తుంది.',
+      kn: 'ಸರ್ಕಾರದ ಉಚಿತ ಕೌಶಲ್ಯ ತರಬೇತಿಗಳು: ೧) ಉಚಿತ ಹೊಲಿಗೆ ತರಬೇತಿ, ೨) ಕಂಪ್ಯೂಟರ್ ಕಲಿಕೆ, ೩) ಬ್ಯೂಟಿಷಿಯನ್ ಕೋರ್ಸ್, ೪) ಕರಕುಶಲ ವಸ್ತುಗಳ ತಯಾರಿಕೆ. ಯಾವುದೇ ಶುಲ್ಕವಿಲ್ಲದೆ ಸರ್ಕಾರಿ ಪ್ರಮಾಣಪತ್ರ ನೀಡಲಾಗುತ್ತದೆ.',
+      ml: 'സൗജന്യ തൊഴിൽ പരിശീലനങ്ങൾ: 1) തയ്യൽ പരിശീലനവും സൗജന്യ തയ്യൽ മെഷീനും, 2) ബേസിക് കമ്പ്യൂട്ടർ കോഴ്സ്, 3) ബ്യൂട്ടീഷ്യൻ കോഴ്സ്, 4) കരകൗശല നിർമ്മാണം. കോഴ്സുകൾ സൗജന്യവും സർക്കാർ അംഗീകാരമുള്ളതുമാണ്.',
+      bn: 'বিনামূল্যে সরকারি প্রশিক্ষণ: ১) সেলাই ও কাটিং কাজ, ২) বেসিক কম্পিউটার ও টাইপিং, ৩) বিউটিশিয়ান কোর্স, ৪) হস্তশিল্প ও ব্যাগ তৈরি। কোনো ফি লাগে না এবং সরকারি সার্টিফিকেট পাওয়া যায়।',
+      pa: 'ਮੁਫ਼ਤ ਸਰਕਾਰੀ ਕੋਰਸ: 1) ਸਿਲਾਈ ਅਤੇ ਕਢਾਈ, 2) ਬੇਸਿਕ ਕੰਪਿਊਟਰ ਸਿੱਖਿਆ, 3) ਬਿਊਟੀਸ਼ੀਅਨ ਕੋਰਸ, 4) ਦਸਤਕਾਰੀ ਅਤੇ ਹੱਥੀਂ ਕੰਮ। ਕੋਈ ਫੀਸ ਨਹੀਂ ਅਤੇ ਸਰਕਾਰੀ ਸਰਟੀਫਿਕੇਟ ਮਿਲਦਾ ਹੈ।',
+      or: 'ମାଗଣା ସରକାରୀ ତାଲିମ: ୧) ସିଲେଇ ଓ ଟେଲରିଂ, ୨) କମ୍ପ୍ୟୁଟର ଶିକ୍ଷା, ୩) ବିୟୁଟିସିଆନ କୋର୍ସ, ୪) ହସ୍ତଶିଳ୍ପ ଓ ବ୍ୟାଗ ତିଆରି। ସରକାରୀ ପ୍ରମାଣପତ୍ର ସହ ସମ୍ପୂର୍ଣ୍ଣ ମାଗଣା।',
+      as: 'বিনামূলীয়া চৰকাৰী প্ৰশিক্ষণ: ১) চিলাই আৰু কাটিং, ২) কম্পিউটাৰ শিক্ষা, ৩) বিউটিচিয়ান কোৰ্ছ, ৪) হস্তশিল্প। কোনো মাচুল নাই আৰু চৰকাৰী চাৰ্টিফিকেট পোৱা যায়।',
+      ur: 'مفت حکومتی کورسز: 1) سلائی اور کڑھائی، 2) بنیادی کمپیوٹر، 3) بیوٹیشن کورس، 4) دستکاری اور گھریلو ہنر۔ یہ تمام کورسز بالکل مفت ہیں اور حکومتی سند بھی دی جاتی ہے۔',
+    },
+    followupSuggestions: {
+      ta: ['தையல் பயிற்சி எங்கு நடக்கிறது?', 'பயிற்சிக்கு வயது வரம்பு என்ன?', 'கணினி பயிற்சிக்கு என்ன தகுதி வேண்டும்?'],
+      hi: ['सिलाई प्रशिक्षण कहाँ होता है?', 'प्रशिक्षण के लिए आयु सीमा क्या है?', 'कंप्यूटर कोर्स के लिए क्या योग्यता चाहिए?'],
+      en: ['Where is the nearest tailoring training center?', 'What is the age limit for free training?', 'What qualification is needed for computer course?'],
+    },
+  },
+
+  // Student Scholarships & Higher Education Support
+  'scholarship-students': {
+    taskType: 'government',
+    mode: 'guided',
+    interpretedMeaning: {
+      ta: 'பள்ளி மற்றும் கல்லூரி மாணவர்களுக்கான அரசு கல்வி உதவித்தொகைகள் மற்றும் கட்டணச் சலுகைகள் பற்றி அறிய விரும்புகிறீர்கள்.',
+      hi: 'आप स्कूली और कॉलेज छात्राओं के लिए सरकारी छात्रवृत्ति और वित्तीय सहायता के बारे में जानना चाहती हैं।',
+      en: 'You want to know about government scholarships, monthly allowances, and tuition concessions available for students.',
+      mr: 'शालेय व महाविद्यालयीन विद्यार्थ्यांसाठी सरकारी शिष्यवृत्ती योजना जाणून घ्यायची आहे.',
+      gu: 'તમે વિદ્યાર્થીઓ માટે સરકારી શિષ્યવૃત્તિ અને ફી માફી યોજનાઓ વિશે જાણવા માંગો છો.',
+      te: 'విద్యార్థుల కోసం ప్రభుత్వ స్కాలర్‌షిప్‌లు మరియు ఆర్థిక సహాయ వివరాలు తెలుసుకోవాలనుకుంటున్నారు.',
+      kn: 'ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸರ್ಕಾರದ ಉಚಿತ ವಿದ್ಯಾರ್ಥಿವೇತನ ಮತ್ತು ಶುಲ್ಕ ಸಹಾಯಧನ ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
+      ml: 'വിദ്യാർത്ഥികൾക്കുള്ള സർക്കാർ സ്കോളർഷിപ്പുകളെയും ഫീസ് ഇളവുകളെയും കുറിച്ച് അറിയാൻ ആഗ്രഹിക്കുന്നു.',
+      bn: 'ছাত্র-ছাত্রীদের জন্য সরকারি স্কলারশিপ ও অনুদান সম্পর্কে জানতে চান।',
+      pa: 'ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਸਰਕਾਰੀ ਵਜੀਫੇ ਅਤੇ ਫੀਸ ਮੁਆਫੀ ਬਾਰੇ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ।',
+      or: 'ଛାତ୍ରଛାତ୍ରୀଙ୍କ ପାଇଁ ସରକାରୀ ବୃତ୍ତି ଓ ସହାୟତା ବିଷୟରେ ଜାଣିବାକୁ ଚାହୁଁଛନ୍ତି।',
+      as: 'শিক্ষাৰ্থীৰ বাবে চৰকাৰী জলপানী আৰু সুবিধাৰ বিষয়ে জানিব বিচাৰিছে।',
+      ur: 'آپ طلباء و طالبات کے لیے سرکاری وظائف اور فیس رعایت کے بارے में جاننا چاہتی ہیں۔',
+    },
+    directAnswer: {
+      ta: 'ஆம், நிச்சயமாக! பள்ளி மற்றும் கல்லூரி மாணவர்களுக்காக அரசாங்கத்தின் சார்பில் பல சிறந்த கல்வி உதவித்தொகை திட்டங்கள் வழங்கப்படுகின்றன:\n1. **புதுமைப் பெண் திட்டம்**: 6 முதல் 12 வரை அரசுப் பள்ளியில் படித்து கல்லூரிக்குச் செல்லும் மாணவிகளுக்கு மாதம் ₹1,000 வங்கி கணக்கில் நேரடியாக செலுத்தப்படுகிறது.\n2. **தேசிய கல்வி உதவித்தொகை தளம் (NSP)**: போஸ்ட்-மெட்ரிக், மெரிட் மற்றும் சிறுபான்மையினர் மாணவிகளுக்கு முழு கட்டண சலுகை மற்றும் உதவித்தொகை.\n3. **முதல் பட்டதாரி கட்டணச் சலுகை**: குடும்பத்தில் முதல் பட்டதாரி மாணவர்களுக்கு கல்லூரி கல்விக் கட்டண விலக்கு.\nமாணவி பெயரில் உள்ள வங்கி கணக்கு புத்தகம், மதிப்பெண் பட்டியல் மற்றும் சேர்க்கை ரசீது கொண்டு கல்லூரி மூலமாகவோ அல்லது scholarships.gov.in தளத்திலோ எளிதாக விண்ணப்பிக்கலாம். HARSHU உங்களுக்கு விண்ணப்பிக்க முழு வழிகாட்டும்!',
+      hi: 'हाँ, बिल्कुल! स्कूल और कॉलेज के छात्रों के लिए कई महत्वपूर्ण सरकारी छात्रवृत्ति योजनाएं उपलब्ध हैं:\n1. **पुधुमै पेन योजना**: सरकारी स्कूल से पढ़कर कॉलेज जाने वाली छात्राओं को प्रतिमाह ₹1,000 की वित्तीय सहायता सीधे बैंक खाते में मिलती है।\n2. **राष्ट्रीय छात्रवृत्ति पोर्टल (NSP)**: पोस्ट-मैट्रिक, मेरिट एवं आरक्षित वर्ग के छात्रों को कॉलेज फीस माफी और वार्षिक छात्रवृत्ति।\n3. **प्रथम स्नातक फीस छूट**: परिवार में पहले ग्रेजुएट बनने वाले छात्र को ट्यूशन फीस में विशेष छूट।\nआवेदन के लिए छात्रा के नाम पर आधार लिंक बैंक खाता, पिछली कक्षा की मार्कशीट और कॉलेज प्रवेश रसीद आवश्यक है। HARSHU आपको चरणबद्ध तरीके से आवेदन का रास्ता बताएगा!',
+      en: 'Yes, absolutely! The government provides several robust scholarship and financial assistance programs for students:\n1. **Pudhumai Penn Scheme**: Girl students who studied classes 6 to 12 in government schools receive ₹1,000 per month directly into their bank accounts throughout their college degree or diploma.\n2. **National Scholarship Portal (NSP)**: Post-matric, merit-cum-means, and pre-matric scholarships covering full tuition fees and study stipends across recognized institutions.\n3. **First Graduate Fee Concession**: Complete tuition fee waiver for the first graduate student in a family.\nTo apply, the student needs an active Aadhaar-linked bank account in her own name, admission fee receipt/bonafide certificate, and marksheet. HARSHU will guide you step by step to verify eligibility and apply!',
+      mr: 'होय, नक्कीच! विद्यार्थ्यांसाठी केंद्र व राज्य शासनाकडून विविध शिष्यवृत्ती उपलब्ध आहेत. उच्च शिक्षण घेणाऱ्या मुलींना मासिक आर्थिक साहाय्य, सावित्रीबाई फुले शिष्यवृत्ती आणि महाडीबीटी/NSP पोर्टलद्वारे संपूर्ण फी माफी दिली जाते. HARSHU तुम्हाला यासाठी पायरी-पायरीने मार्गदर्शन करेल.',
+      gu: 'હા, બિલકુલ! વિદ્યાર્થીઓ માટે સરકારી શિષ્યવૃત્તિઓ ઉપલબ્ધ છે: કોલેજની વિદ્યાર્થિનીઓ માટે માસિક સહાય, નેશનલ સ્કોલરશિપ પોર્ટલ (NSP) દ્વારા ફી માફી અને મેરિટ ગ્રાન્ટ. વિદ્યાર્થીના પોતાના બેંક ખાતામાં સીધા નાણાં જમા થાય છે.',
+      te: 'అవును, ఖచ్చితంగా! ప్రభుత్వం విద్యార్థుల కోసం అనేక స్కాలర్‌షిప్ పథకాలను అందిస్తోంది. ముఖ్యంగా కళాశాల విద్యార్థినులకు నెలకు ₹1,000 సహాయం, పూర్తి ఫీజు రీయింబర్స్‌మెంట్ మరియు నేషనల్ స్కాలర్‌షిప్ పోర్టల్ (NSP) గ్రాంట్లు అందుబాటులో ఉన్నాయి.',
+      kn: 'ಹೌದು, ಖಂಡಿತವಾಗಿಯೂ! ಶಾಲಾ ಮತ್ತು ಕಾಲೇಜು ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸರ್ಕಾರದಿಂದ ಅನೇಕ ವಿದ್ಯಾರ್ಥಿವೇತನಗಳು ಲಭ್ಯವಿವೆ. ವಿದ್ಯಾರ್ಥಿನಿಯರಿಗೆ ಮಾಸಿಕ ಸಹಾಯಧನ ಮತ್ತು ರಾಷ್ಟ್ರೀಯ ವಿದ್ಯಾರ್ಥಿವೇತನ ಪೋರ್ಟಲ್ (NSP) ಮೂಲಕ ಪೂರ್ಣ ಶುಲ್ಕ ವಿನಾಯಿತಿ ಸಿಗುತ್ತದೆ.',
+      ml: 'തീർച്ചയായും! വിദ്യാർത്ഥികൾക്കായി നിരവധി സ്കോളർഷിപ്പുകൾ ലഭ്യമാണ്. കോളേജ് വിദ്യാർത്ഥിനികൾക്ക് പ്രതിമാസം ₹1,000 ധനസഹായം, ഫീസ് ഇളവുകൾ, നാഷണൽ സ്കോളർഷിപ്പ് പോർട്ടൽ (NSP) വഴിയുള്ള മെറിറ്റ് ഗ്രാന്റുകൾ എന്നിവ ഇതിൽ ഉൾപ്പെടുന്നു.',
+      bn: 'হ্যাঁ, নিশ্চয়ই! শিক্ষার্থীদের জন্য সরকারি স্কলারশিপ রয়েছে: কলেজ ছাত্রীদের জন্য মাসিক ₹১,০০০ অনুদান, ন্যাশনাল স্কলারশিপ পোর্টাল (NSP) এর মাধ্যমে সম্পূর্ণ ফি মকুব ও মেরিট স্কলারশিপ সরাসরি ব্যাংক অ্যাকাউন্টে দেওয়া হয়।',
+      pa: 'ਹਾਂ, ਬਿਲਕੁਲ! ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਨੈਸ਼ਨਲ ਸਕਾਲਰਸ਼ਿਪ ਪੋਰਟਲ (NSP) ਰਾਹੀਂ ਪੋਸਟ-ਮੈਟ੍ਰਿਕ ਵਜੀਫੇ, ਫੀਸ ਮੁਆਫੀ ਅਤੇ ਕਾਲਜ ਵਿਦਿਆਰਥਣਾਂ ਲਈ ਮਾਸਿਕ ਵਿੱਤੀ ਸਹਾਇਤਾ ਉਪਲਬਧ ਹੈ।',
+      or: 'ହଁ, ନିଶ୍ଚିତ ଭାବରେ! ଛାତ୍ରଛାତ୍ରୀଙ୍କ ପାଇଁ ସରକାରଙ୍କ ଦ୍ୱାରା ଅନେକ ବୃତ୍ତି ଯୋଜନା ଅଛି: କଲେଜ ଛାତ୍ରୀଙ୍କୁ ମାସିକ ସହାୟତା, ଫି ଛାଡ଼ ଓ ଜାତୀୟ ବୃତ୍ତି ପୋର୍ଟାଲ (NSP) ମାଧ୍ୟମରେ ସିଧାସଳଖ ବ୍ୟାଙ୍କ ଖାତାକୁ ଟଙ୍କା ପ୍ରଦାନ କରାଯାଏ।',
+      as: 'হয়, নিশ্চয়! ছাত্ৰ-ছাত্ৰীৰ বাবে চৰকাৰী জলপানী আঁচনি আছে: কলেজৰ ছাত্ৰীৰ বাবে মাহেকীয়া সাহায্য, মাচুল ৰেহাই আৰু ৰাষ্ট্ৰীয় স্কলাৰশ্বিপ পোৰ্টেল (NSP)ৰ জৰিয়তে আৰ্থিক সাহাৰ্য পোৱা যায়।',
+      ur: 'ہاں، بالکل! طلباء کے لیے اسکالرشپ اسکیمیں دستیاب ہیں: کالج جانے والی طالبات کے لیے ماہانہ ₹1,000 وظیفہ، نیشنل اسکالرشپ پورٹل (NSP) کے تحت ٹیوشن فیس معافی اور وظائف براہ راست بینک اکاؤنٹ میں آتے ہیں۔',
+    },
+    followupSuggestions: {
+      ta: ['புதுமைப் பெண் திட்டத்திற்கு என்ன தகுதிகள் வேண்டும்?', 'NSP போர்ட்டலில் விண்ணப்பிக்க கடைசி தேதி என்ன?', 'தனியார் கல்லூரி மாணவிகளுக்கு உதவித்தொகை கிடைக்குமா?'],
+      hi: ['पुधुमै पेन योजना के लिए क्या पात्रता है?', 'NSP पोर्टल पर आवेदन की अंतिम तिथि क्या है?', 'प्राइवेट कॉलेज की छात्राओं को क्या मदद मिलती है?'],
+      en: ['What is the eligibility for Pudhumai Penn scheme?', 'What is the deadline on the NSP portal?', 'Are private college students eligible?'],
+    },
+  },
 };
 
 // 3. Main Universal Understanding Pipeline
@@ -475,25 +640,16 @@ export async function understandUserNeed(
 ): Promise<IntentResult> {
   const trimmed = rawInput.trim();
   const detectedLang = detectLanguageFromText(trimmed, preferredLanguage);
+  // Important: The user's selected language strictly dictates the output language of the HARSHU experience
+  const targetLang = preferredLanguage || detectedLang || 'en';
 
-  // Check if live Gemini API key is available
-  const apiKey = getGeminiApiKey();
-  if (apiKey) {
-    try {
-      const liveResult = await callGeminiUniversal(trimmed, conversationHistory, detectedLang, apiKey);
-      if (liveResult) return liveResult;
-    } catch (err) {
-      console.warn('Gemini live call error, falling back to local universal knowledge engine:', err);
-    }
-  }
-
-  // 1. Check local Universal Resource templates (Travel, Navigation, Cinema, Cooking, WhatsApp, Electricity, Aadhaar, Science)
+  // 1. Check local Universal Resource templates (Travel, Navigation, Cinema, Cooking, WhatsApp, Electricity, Aadhaar, Science, Certificates, Skills, Scholarships)
   const universalMatch = matchUniversalResource(trimmed);
   if (universalMatch) {
     const domainData = UNIVERSAL_DOMAIN_ANSWERS[universalMatch.id];
-    const meaning = domainData?.interpretedMeaning[detectedLang] || domainData?.interpretedMeaning[preferredLanguage] || domainData?.interpretedMeaning.en || trimmed;
-    const directAnswer = domainData?.directAnswer[detectedLang] || domainData?.directAnswer[preferredLanguage] || domainData?.directAnswer.en || 'HARSHU will guide you.';
-    const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === detectedLang);
+    const meaning = domainData?.interpretedMeaning[targetLang] || domainData?.interpretedMeaning[detectedLang] || domainData?.interpretedMeaning.en || trimmed;
+    const directAnswer = domainData?.directAnswer[targetLang] || domainData?.directAnswer[detectedLang] || domainData?.directAnswer.en || 'HARSHU will guide you.';
+    const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === targetLang) || SUPPORTED_LANGUAGES.find((l) => l.code === detectedLang);
 
     return {
       category: universalMatch.category,
@@ -517,32 +673,93 @@ export async function understandUserNeed(
     };
   }
 
+  // 2. Check Universal Near Me / Location Queries (real places, distances, directions, context)
+  const locationResult = await processLocationQuery(trimmed, detectedLang, conversationHistory);
+  if (locationResult) {
+    return locationResult;
+  }
+
+  // Check if live Gemini API key is available
+  const apiKey = getGeminiApiKey();
+  if (apiKey) {
+    try {
+      const liveResult = await callGeminiUniversal(trimmed, conversationHistory, detectedLang, apiKey);
+      if (liveResult) return liveResult;
+    } catch (err) {
+      console.warn('Gemini live call error, falling back to local universal knowledge engine:', err);
+    }
+  }
+
   // 2. Check Dynamic Government / Citizen Service Discovery
   const discoveredGov = await discoverOfficialResource(trimmed, detectedLang);
-  if (discoveredGov && (discoveredGov.id === 'national-scholarship-portal' || discoveredGov.id === 'pm-vishwakarma' || discoveredGov.id === 'pm-mudra-yojana' || discoveredGov.id === 'tnega-esevai' || discoveredGov.id === 'free-sewing-machine' || discoveredGov.id === 'pudhumai-penn-scholarship' || discoveredGov.id === 'magalir-urimai-thittam' || discoveredGov.id === 'pm-kaushal-vikas-yojana')) {
+  if (discoveredGov && (discoveredGov.id === 'national-scholarship-portal' || discoveredGov.id === 'pm-vishwakarma' || discoveredGov.id === 'pm-mudra-yojana' || discoveredGov.id === 'tnega-esevai' || discoveredGov.id === 'free-sewing-machine' || discoveredGov.id === 'pudhumai-penn-scholarship' || discoveredGov.id === 'magalir-urimai-thittam' || discoveredGov.id === 'pm-kaushal-vikas-yojana' || discoveredGov.id === 'service-government-certificate' || discoveredGov.id === 'skills-learn-free' || discoveredGov.id === 'scholarship-students')) {
     const isScholarship = discoveredGov.id.includes('scholarship');
-    const isSkills = discoveredGov.id.includes('sewing') || discoveredGov.id.includes('vishwakarma');
+    const isCertificate = discoveredGov.id.includes('esevai') || discoveredGov.id.includes('certificate');
+    const isSkills = discoveredGov.id.includes('sewing') || discoveredGov.id.includes('vishwakarma') || discoveredGov.id.includes('skill');
     const isJobs = discoveredGov.id.includes('mudra') || discoveredGov.id.includes('kaushal');
     const isWelfare = discoveredGov.id.includes('magalir');
 
-    let templateKey = 'scholarship';
-    if (isSkills) templateKey = 'skills';
-    else if (isJobs) templateKey = 'jobs';
-    else if (isWelfare) templateKey = 'welfare';
+    let fallbackMeaning = '';
+    let fallbackAnswer = '';
 
-    const fallbackMeaning = isScholarship
-      ? 'மாணவர்களுக்கான அரசு கல்வி உதவித்தொகை பற்றி அறிய விரும்புகிறீர்கள்.'
-      : isSkills
-      ? 'தையல் பயிற்சி மற்றும் இலவச தையல் இயந்திர உதவி பற்றி அறிய விரும்புகிறீர்கள்.'
-      : 'அரசு உதவி மற்றும் வேலைவாய்ப்பு பற்றி அறிய விரும்புகிறீர்கள்.';
+    if (isCertificate) {
+      fallbackMeaning = targetLang === 'ta'
+        ? 'வருமானம், சாதி, இருப்பிடம் போன்ற அரசு சான்றிதழ்களை இ-சேவை மூலம் எவ்வாறு விண்ணப்பிப்பது என்று அறிய விரும்புகிறீர்கள்.'
+        : targetLang === 'hi'
+        ? 'आप आय, जाति या निवास प्रमाण पत्र के लिए ई-सेवा या ऑनलाइन कैसे आवेदन करें यह जानना चाहती हैं।'
+        : 'You want to know how to apply for government certificates via e-Sevai or online.';
+      fallbackAnswer = targetLang === 'ta'
+        ? 'அரசு சான்றிதழ்கள் பெற உங்கள் ஆதார் அட்டை, ஸ்மார்ட் ரேஷன் கார்டு மற்றும் புகைப்படத்துடன் அருகிலுள்ள இ-சேவை (e-Sevai) மையத்தை அணுகலாம் அல்லது tnesevai.tn.gov.in போர்ட்டலில் விண்ணப்பிக்கலாம். விண்ணப்பித்த பின் கிடைக்கும் ஒப்புகை எண் கொண்டு சான்றிதழை பதிவிறக்கம் செய்யலாம். HARSHU உங்களுக்கு ஒரு படியாக வழிகாட்டும்.'
+        : targetLang === 'hi'
+        ? 'सरकारी प्रमाण पत्र बनवाने के लिए आधार कार्ड और राशन कार्ड के साथ नजदीकी ई-सेवा (e-Sevai / CSC) केंद्र जाएं या tnesevai.tn.gov.in पर ऑनलाइन आवेदन करें। रसीद संख्या से प्रमाण पत्र डाउनलोड किया जा सकता है। HARSHU आपको चरणबद्ध मार्गदर्शन देगा।'
+        : 'To apply for government certificates, visit your nearest e-Sevai centre or register at tnesevai.tn.gov.in with your Aadhaar and Ration Card. Once verified by Revenue authorities, you can download your digitally signed certificate. HARSHU will guide you step by step.';
+    } else if (isScholarship) {
+      fallbackMeaning = targetLang === 'ta'
+        ? 'மாணவர்களுக்கான அரசு கல்வி உதவித்தொகை பற்றி அறிய விரும்புகிறீர்கள்.'
+        : targetLang === 'hi'
+        ? 'आप छात्रों के लिए सरकारी छात्रवृत्ति और वित्तीय सहायता के बारे में जानना चाहती हैं।'
+        : 'You want to know about government scholarships and student financial support.';
+      fallbackAnswer = targetLang === 'ta'
+        ? 'ஆம், நிச்சயமாக! கல்லூரி மற்றும் பள்ளி மாணவர்களுக்காக தேசிய உதவித்தொகை தளம் (NSP) மற்றும் புதுமைப் பெண் மாதம் ₹1,000 திட்டம் போன்ற பல்வேறு அரசு உதவித்தொகைகள் உள்ளன. HARSHU உங்களுக்கு விண்ணப்பிக்கும் முறையை ஒரு படியாக காட்டும்.'
+        : targetLang === 'hi'
+        ? 'हाँ, बिल्कुल! स्कूल और कॉलेज के छात्रों के लिए राष्ट्रीय छात्रवृत्ति पोर्टल (NSP) तथा पुधुमै पेन ₹1,000 मासिक योजना जैसी कई महत्वपूर्ण छात्रवृत्तियां हैं। HARSHU आपको आवेदन की पूरी प्रक्रिया समझाएगा।'
+        : 'Yes, absolutely! There are several government scholarships available for students, including the Pudhumai Penn ₹1,000 monthly allowance and National Scholarship Portal (NSP) tuition concessions. HARSHU will guide you step by step.';
+    } else if (isSkills) {
+      fallbackMeaning = targetLang === 'ta'
+        ? 'தையல் மற்றும் பிற இலவச தொழிற்பயிற்சி மற்றும் உதவி பற்றி அறிய விரும்புகிறீர்கள்.'
+        : targetLang === 'hi'
+        ? 'आप महिलाओं के लिए मुफ्त सिलाई व व्यावसायिक कौशल प्रशिक्षण के बारे में जानना चाहती हैं।'
+        : 'You want to know about free skill development and vocational training for women.';
+      fallbackAnswer = targetLang === 'ta'
+        ? 'ஆம்! தமிழ்நாடு திறன் மேம்பாட்டுக் கழகம் (TNSDC) சார்பாக பெண்களுக்கு முற்றிலும் இலவச தையல், கணினி, பியூட்டிசியன் மற்றும் கைவினைப் பயிற்சிகள் வழங்கப்படுகின்றன. HARSHU உங்களுக்கு இதில் சேர வழிகாட்டும்.'
+        : targetLang === 'hi'
+        ? 'हाँ! महिलाओं के लिए सरकारी कौशल विकास निगम द्वारा मुफ्त सिलाई, कंप्यूटर, ब्यूटीशियन और हस्तशिल्प प्रशिक्षण उपलब्ध है। HARSHU आपको नामांकन प्रक्रिया में सहायता करेगा।'
+        : 'Yes! Government skill development missions (TNSDC & PMKVY) provide completely free courses in tailoring, computers, beautician, and handicrafts with official certificates. HARSHU will guide you to enroll.';
+    } else if (isWelfare) {
+      fallbackMeaning = targetLang === 'ta'
+        ? 'மகளிர் உரிமைத் தொகை மற்றும் அரசு நலத்திட்டங்கள் பற்றி அறிய விரும்புகிறீர்கள்.'
+        : targetLang === 'hi'
+        ? 'आप महिला सम्मान मासिक सहायता योजना के बारे में जानना चाहती हैं।'
+        : 'You want to know about the Women’s Monthly Rights Grant and welfare benefits.';
+      fallbackAnswer = targetLang === 'ta'
+        ? 'குடும்பத் தலைவிகளுக்கு மாதம் ₹1,000 வாழ்வாதார உரிமைத் தொகையாக வங்கி கணக்கில் நேரடியாக செலுத்தப்படுகிறது. ரேஷன் கார்டு உள்ள தகுதியான பெண்கள் இதற்கு விண்ணப்பிக்கலாம்.'
+        : targetLang === 'hi'
+        ? 'महिला मुखियाओं को ₹1,000 प्रति माह सम्मानजनक आजीविका सहायता सीधे बैंक खाते में दी जाती है। राशन कार्ड धारक महिलाएं पात्र हैं।'
+        : 'The government provides ₹1,000 per month directly into bank accounts for eligible female heads of families under the Women’s Rights Grant.';
+    } else {
+      fallbackMeaning = targetLang === 'ta'
+        ? 'அரசு உதவி மற்றும் சேவைகள் பற்றி அறிய விரும்புகிறீர்கள்.'
+        : targetLang === 'hi'
+        ? 'आप सरकारी सेवाओं और सहायता के बारे में जानना चाहती हैं।'
+        : 'You want guidance regarding government citizen services and resources.';
+      fallbackAnswer = targetLang === 'ta'
+        ? 'இதற்கான அதிகாரப்பூர்வ அரசு சேவைகள் மற்றும் வழிகாட்டுதல்கள் உள்ளன. HARSHU உங்களுக்கு ஒரு படியாக வழிகாட்டும்.'
+        : targetLang === 'hi'
+        ? 'इसके लिए आधिकारिक सरकारी सेवाएं और पोर्टल उपलब्ध हैं। HARSHU आपको चरणबद्ध मार्गदर्शन प्रदान करेगा।'
+        : 'Verified official government portals and services are available for this need. HARSHU will guide you step by step.';
+    }
 
-    const fallbackAnswer = isScholarship
-      ? 'ஆம், நிச்சயமாக! கல்லூரி மற்றும் பள்ளி மாணவர்களுக்காக தேசிய உதவித்தொகை தளம் (NSP) மற்றும் மாநில அரசுகளின் பல்வேறு உதவித்தொகைகள் உள்ளன. HARSHU உங்களுக்கு விண்ணப்பிக்கும் முறையை ஒரு படியாக காட்டும்.'
-      : isSkills
-      ? 'ஆம்! பெண்களுக்கு இலவச தையல் பயிற்சி மற்றும் இலவச தையல் இயந்திர உதவி திட்டங்கள் உள்ளன. இதற்கு தேவையான ஆவணங்களை HARSHU உங்களுக்கு விளக்கும்.'
-      : 'ஆம்! இதற்கான அரசு சேவைகள் மற்றும் வழிகாட்டுதல்கள் உள்ளன. HARSHU உங்களுக்கு ஒரு படியாக வழிகாட்டும்.';
-
-    const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === detectedLang);
+    const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === targetLang) || SUPPORTED_LANGUAGES.find((l) => l.code === detectedLang);
 
     return {
       category: discoveredGov.category,
@@ -566,17 +783,29 @@ export async function understandUserNeed(
   }
 
   // 3. Fallback Universal Open-Ended Response
-  const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === detectedLang);
-  const friendlyMeaning = detectedLang === 'ta'
+  const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === targetLang) || SUPPORTED_LANGUAGES.find((l) => l.code === detectedLang);
+  const friendlyMeaning = targetLang === 'ta'
     ? `"${trimmed}" பற்றி அறிய விரும்புகிறீர்கள்.`
-    : detectedLang === 'hi'
+    : targetLang === 'hi'
     ? `आप "${trimmed}" के बारे में जानना चाहती हैं।`
+    : targetLang === 'mr'
+    ? `तुम्हाला "${trimmed}" बद्दल माहिती हवी आहे.`
+    : targetLang === 'te'
+    ? `మీరు "${trimmed}" గురించి తెలుసుకోవాలనుకుంటున్నారు.`
+    : targetLang === 'kn'
+    ? `ನೀವು "${trimmed}" ಬಗ್ಗೆ ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.`
     : `You want guidance regarding "${trimmed}".`;
 
-  const friendlyAnswer = detectedLang === 'ta'
+  const friendlyAnswer = targetLang === 'ta'
     ? `நிச்சயமாக! HARSHU உங்களுக்கு "${trimmed}" குறித்து தேவையான அனைத்து தகவல்களையும் எளிய தமிழில் விளக்கி, அடுத்தடுத்த படிகளில் வழிகாட்டும். பயப்பட வேண்டாம், நாம் சேர்ந்து செய்வோம்.`
-    : detectedLang === 'hi'
+    : targetLang === 'hi'
     ? `बिल्कुल! HARSHU आपको "${trimmed}" के बारे में सरल और स्पष्ट जानकारी देकर आगे का रास्ता बताएगा। चिंता न करें, हम मिलकर करेंगे।`
+    : targetLang === 'mr'
+    ? `नक्कीच! HARSHU तुम्हाला "${trimmed}" बद्दल सोप्या भाषेत संपूर्ण माहिती देऊन मार्गदर्शन करेल. काळजी करू नका, आपण मिळून करूया.`
+    : targetLang === 'te'
+    ? `తప్పకుండా! HARSHU మీకు "${trimmed}" గురించి స్పష్టమైన సమాచారం అందించి మార్గదర్శనం చేస్తుంది. భయపడకండి, మనం కలిసి చేద్దాం.`
+    : targetLang === 'kn'
+    ? `ಖಂಡಿತವಾಗಿಯೂ! HARSHU ನಿಮಗೆ "${trimmed}" ಕುರಿತು ಸರಳವಾಗಿ ತಿಳಿಸಿ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತದೆ. ಆತಂಕ ಬೇಡ, ಒಟ್ಟಾಗಿ ಮಾಡೋಣ.`
     : `Yes, certainly! HARSHU will explain everything you need to know about "${trimmed}" in simple words and guide you step by step. Don't worry, let's do it together.`;
 
   return {
@@ -614,6 +843,16 @@ async function callGeminiUniversal(
       rawInput.toLowerCase()
     );
 
+  // Topic & Intent disambiguation checks
+  const isTrainRelated =
+    /train|railway|irctc|uts|rail|ரயில்|தொடர்வண்டி|ரயில்வே|ट्रेन|रेल|రైలు|ರೈಲು/i.test(
+      rawInput
+    );
+  const isCinemaRelated =
+    /cinema|movie|film|theatre|theater|திரைப்படம்|சினிமா|படம்|தியேட்டர்|सिनेमा|फिल्म|थिएटर/i.test(
+      rawInput
+    );
+
   const historyContext = history.length > 0
     ? `\nPrior conversation turns:\n${history
         .map((h) => `${h.role === 'user' ? 'User' : 'HARSHU'}: ${h.text}`)
@@ -624,7 +863,7 @@ async function callGeminiUniversal(
 HARSHU is a UNIVERSAL companion. She can ask about ANY topic:
 - Travel / transportation (bus routes, bus stands like CMBT/Tambaram, timings, fares)
 - Navigation / local transit (walking routes, stations like Chennai Central to Chennai Park subway)
-- Online booking (cinema movie tickets on BookMyShow, train UTS, bus tickets)
+- Online booking (train tickets on IRCTC, cinema movie tickets on BookMyShow, bus tickets on TNSTC)
 - Cooking / recipes (authentic recipes like biriyani, ingredients, measurements, simple cooking steps)
 - Technology (setting up WhatsApp, using mobile apps, play store, phone settings)
 - Online payments (paying electricity bill online, consumer number, UPI safety, TANGEDCO/BBPS)
@@ -632,13 +871,17 @@ HARSHU is a UNIVERSAL companion. She can ask about ANY topic:
 - Everyday general knowledge (what is Aadhaar, what is photosynthesis, health precautions).
 
 CRITICAL RULES:
-1. Answer the user's ACTUAL question directly in her own language (${detectedLang}).
-2. Do NOT just rephrase or translate her question. Provide real, factual, helpful information.
-3. Tone: Gentle, warm, reassuring, plain language, maternal. Never sound robotic or arrogant.
-4. Safety: Never ask for OTP, passwords, or bank PIN.
-5. If it's a practical digital or physical task (booking, travel, cooking, tech, payment), provide 3 to 5 gentle "Do It With Me" steps.
-6. If it's a general question (e.g. "What is photosynthesis?"), set mode="direct_answer" and do NOT force unnecessary steps.
-7. Return ONLY valid JSON matching this exact structure:
+1. Answer the user's ACTUAL question directly in her own language (${detectedLang}). Every message must be interpreted independently based on her current meaning.
+2. TOPIC SWITCHING: If the user changes topic or asks a new question, focus 100% on the NEW request. NEVER carry over context, instructions, or steps from unrelated previous conversation topics.
+3. TICKET BOOKING DIFFERENTIATION (CRITICAL):
+   - Train / Railway Tickets: Use Indian Railways, IRCTC Rail Connect, UTS, Sleeper/3AC class, PNR number. NEVER suggest BookMyShow or movie cinema halls for trains!
+   - Cinema / Movie Tickets: Use BookMyShow, cinema theatres, movie showtimes, seat layout. NEVER suggest IRCTC or train stations for movie tickets!
+   - Bus Tickets: Use TNSTC, SETC, RedBus, government bus services.
+4. Tone: Gentle, warm, reassuring, plain language, maternal. Never sound robotic or arrogant.
+5. Safety: Never ask for OTP, passwords, or bank PIN.
+6. If it's a practical digital or physical task (booking, travel, cooking, tech, payment), provide 3 to 5 gentle "Do It With Me" steps.
+7. If it's a general question (e.g. "What is photosynthesis?"), set mode="direct_answer" and do NOT force unnecessary steps.
+8. Return ONLY valid JSON matching this exact structure:
 {
   "detectedLanguage": "${detectedLang}",
   "taskType": "travel" | "navigation" | "booking" | "cooking" | "technology" | "payment" | "government" | "general",
@@ -647,7 +890,7 @@ CRITICAL RULES:
   "directAnswer": "The actual direct, factual, helpful, patient answer to her question in her language",
   "destinationTitle": "Title of the resource or guide in her language",
   "destinationDepartment": "Department, Authority, or Platform name",
-  "destinationUrl": "Verified official URL if applicable (e.g. https://scholarships.gov.in, https://in.bookmyshow.com, https://www.tnstc.in, https://www.whatsapp.com, https://www.tnebnet.org), or leave empty",
+  "destinationUrl": "Verified official URL if applicable (e.g. https://www.irctc.co.in, https://scholarships.gov.in, https://in.bookmyshow.com, https://www.tnstc.in, https://www.whatsapp.com, https://www.tnebnet.org), or leave empty",
   "steps": [
     {
       "stepNumber": 1,
@@ -661,7 +904,9 @@ CRITICAL RULES:
   "followupSuggestions": ["Quick follow-up question 1", "Quick follow-up question 2"]
 }`;
 
-  const prompt = `${historyContext}User just asked: "${rawInput}"
+  const prompt = `${historyContext}
+IMPORTANT: Focus exclusively on the user's current request: "${rawInput}".
+If the user switched topics from earlier conversation, answer the NEW topic directly.
 Detected language/script: ${detectedLang}`;
 
   const response = await client.models.generateContent({
@@ -680,6 +925,38 @@ Detected language/script: ${detectedLang}`;
   const parsed = JSON.parse(jsonMatch[0]);
   const lang = (parsed.detectedLanguage as Language) || detectedLang;
   const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === lang);
+
+  // Safeguard: If user asked for train ticket but model mistakenly mentioned cinema / bookmyshow, override with verified train resource
+  if (
+    isTrainRelated &&
+    (parsed.destinationUrl?.includes('bookmyshow') ||
+      /cinema|movie|theatre|theater|திரைப்படம்|சினிமா|படம்|தியேட்டர்|सिनेमा|फिल्म/i.test(
+        (parsed.directAnswer || '') + ' ' + (parsed.interpretedMeaning || '')
+      ))
+  ) {
+    const localTrain = UNIVERSAL_RESOURCES.find((r) => r.id === 'booking-train-ticket');
+    const domainData = UNIVERSAL_DOMAIN_ANSWERS['booking-train-ticket'];
+    return {
+      category: 'booking',
+      taskType: 'booking',
+      rawInput,
+      recognizedText: rawInput,
+      detectedLanguage: lang,
+      detectedLanguageName: langMeta ? `${langMeta.nativeLabel} (${langMeta.label})` : lang,
+      interpretedMeaning: domainData?.interpretedMeaning[lang] || domainData?.interpretedMeaning.en || rawInput,
+      directAnswer: domainData?.directAnswer[lang] || domainData?.directAnswer.en || '',
+      summaryByLanguage: {
+        ta: domainData?.interpretedMeaning.ta || rawInput,
+        hi: domainData?.interpretedMeaning.hi || rawInput,
+        en: domainData?.interpretedMeaning.en || rawInput,
+      },
+      schemeId: 'booking-train-ticket',
+      discoveredResource: localTrain,
+      mode: 'guided',
+      followupSuggestions: domainData?.followupSuggestions,
+      isAiGenerated: true,
+    };
+  }
 
   // Construct dynamic Resource object from Gemini output if steps or destination provided
   let discoveredResource: Resource | undefined;

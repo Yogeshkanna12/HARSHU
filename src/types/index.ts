@@ -31,6 +31,7 @@ export type TaskType =
   | 'cooking'
   | 'technology'
   | 'payment'
+  | 'location'
   | 'government'
   | 'health'
   | 'education'
@@ -43,6 +44,34 @@ export type TaskType =
   | 'other';
 
 export type IntentCategory = TaskType;
+
+export interface NearbyPlace {
+  id: string;
+  name: string;
+  category: string;
+  address: string;
+  distanceKm?: number;
+  latitude?: number;
+  longitude?: number;
+  openNow?: boolean | null;
+  phone?: string;
+  website?: string;
+  directionsUrl: string;
+  mapUrl: string;
+  rating?: number;
+}
+
+export interface LocationData {
+  queryCategory: string; // e.g. "hospitals", "colleges", "pharmacy", "ATM", etc.
+  rawCategory?: string;
+  targetArea?: string; // e.g. "Avadi" or undefined if "near me"
+  userCoords?: { latitude: number; longitude: number };
+  places: NearbyPlace[];
+  status: 'ready' | 'needs_location_permission' | 'no_results' | 'error';
+  isFollowUp?: 'closest' | 'directions' | 'nearby_other';
+  selectedPlace?: NearbyPlace;
+  errorMessage?: string;
+}
 
 export interface ClarificationQuestion {
   text: string;
@@ -76,6 +105,7 @@ export interface IntentResult {
   primaryActionLabel?: Record<string, string>;
   recipeData?: RecipeData;
   travelData?: TravelData;
+  locationData?: LocationData;
 }
 
 export interface QuestionOption {
@@ -148,6 +178,7 @@ export interface Resource {
   mode?: 'direct_answer' | 'guided' | 'recipe' | 'travel' | 'service';
   recipeData?: RecipeData;
   travelData?: TravelData;
+  locationData?: LocationData;
   primaryActionLabel?: Record<string, string>;
   primaryActionType?: 'do_it_with_me' | 'open_website' | 'open_map' | 'cook_together' | 'none';
   followupSuggestions?: Record<string, string[]>;

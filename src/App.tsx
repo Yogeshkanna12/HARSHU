@@ -12,6 +12,7 @@ import { CompletionScreen } from './components/harshu/CompletionScreen';
 import { JudgeModal } from './components/harshu/JudgeModal';
 import { detectIntentAsync, getSchemeById } from './utils/intentEngine';
 import { VERIFIED_SCHEMES } from './data/schemes';
+import { EssentialServiceItem } from './data/essentialServices';
 import { Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -20,6 +21,7 @@ export const App: React.FC = () => {
   const [screenState, setScreenState] = useState<ScreenState>('opening');
   const [voiceMode, setVoiceMode] = useState<'voice' | 'text'>('voice');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [activeServiceContext, setActiveServiceContext] = useState<EssentialServiceItem | null>(null);
 
   // Active task context & conversational history
   const [currentIntent, setCurrentIntent] = useState<IntentResult | null>(null);
@@ -29,13 +31,21 @@ export const App: React.FC = () => {
 
   // Transitions
   const handleStartVoice = () => {
+    setActiveServiceContext(null);
     setVoiceMode('voice');
     setScreenState('listening');
   };
 
   const handleStartText = () => {
+    setActiveServiceContext(null);
     setVoiceMode('text');
     setScreenState('typing');
+  };
+
+  const handleStartEssentialService = (service: EssentialServiceItem) => {
+    setActiveServiceContext(service);
+    setVoiceMode('voice');
+    setScreenState('listening');
   };
 
   const handleEnterCompanion = () => {
@@ -43,6 +53,7 @@ export const App: React.FC = () => {
   };
 
   const handleHome = () => {
+    setActiveServiceContext(null);
     setScreenState('home');
   };
 
@@ -54,7 +65,7 @@ export const App: React.FC = () => {
         : category === 'navigation'
         ? 'சென்னை சென்ட்ரலில் இருந்து பார்க் ஸ்டேஷன் போவது எப்படி?'
         : category === 'booking'
-        ? 'சினிமா டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?'
+        ? 'ரயில் டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?'
         : category === 'cooking'
         ? 'சுவையான பிரியாணி செய்வது எப்படி?'
         : category === 'technology'
@@ -86,9 +97,7 @@ export const App: React.FC = () => {
     try {
       const intentResult = await detectIntentAsync(text, currentLanguage, updatedHistory);
       setCurrentIntent(intentResult);
-      if (intentResult.detectedLanguage) {
-        setCurrentLanguage(intentResult.detectedLanguage);
-      }
+      // NOTE: Never silently change currentLanguage; the user's selected language remains consistent
       const res = intentResult.discoveredResource || getSchemeById(intentResult.schemeId);
       setActiveResource(res);
 
@@ -129,6 +138,7 @@ export const App: React.FC = () => {
   };
 
   const handleRestartJourney = () => {
+    setActiveServiceContext(null);
     setScreenState('home');
     setCurrentIntent(null);
     setChatHistory([]);
@@ -210,6 +220,7 @@ export const App: React.FC = () => {
                 onStartVoice={handleStartVoice}
                 onStartText={handleStartText}
                 onSelectCategory={handleSelectCategory}
+                onStartEssentialService={handleStartEssentialService}
               />
             )}
 
@@ -217,8 +228,15 @@ export const App: React.FC = () => {
               <VoiceInteraction
                 currentLanguage={currentLanguage}
                 initialMode={voiceMode}
-                onSubmit={handleInputSubmit}
-                onCancel={handleBack}
+                serviceContext={activeServiceContext}
+                onSubmit={(text) => {
+                  setActiveServiceContext(null);
+                  handleInputSubmit(text);
+                }}
+                onCancel={() => {
+                  setActiveServiceContext(null);
+                  handleBack();
+                }}
               />
             )}
 
@@ -228,6 +246,7 @@ export const App: React.FC = () => {
                 intent={currentIntent}
                 onConfirm={handleIntentConfirmed}
                 onChange={() => setScreenState('listening')}
+                onQuerySubmit={handleInputSubmit}
               />
             )}
 
@@ -280,7 +299,7 @@ export const App: React.FC = () => {
                 onClick={() => setIsJudgeModalOpen(true)}
                 className="text-amber-800 hover:text-amber-950 underline font-medium"
               >
-                ⚖️ Hackathon Story & Multilingual Architecture
+                📖 Description & Multilingual Architecture
               </button>
             </div>
           </footer>

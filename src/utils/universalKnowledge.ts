@@ -395,7 +395,286 @@ export const UNIVERSAL_RESOURCES: Resource[] = [
     },
   },
 
-  // 3. ONLINE BOOKING: Cinema Ticket Online Booking
+  // 3. ONLINE BOOKING: Train Ticket Online Booking (IRCTC & UTS)
+  {
+    id: 'booking-train-ticket',
+    category: 'booking',
+    taskType: 'booking',
+    mode: 'guided',
+    title: {
+      ta: 'ரயில் டிக்கெட் ஆன்லைனில் முன்பதிவு செய்வது எப்படி? (IRCTC & UTS வழிகாட்டி)',
+      hi: 'ट्रेन टिकट ऑनलाइन कैसे बुक करें? (IRCTC / UTS आसान तरीका)',
+      en: 'How to Book Train Tickets Online (IRCTC & UTS Railway Guide)',
+      mr: 'रेल्वे तिकीट ऑनलाइन कसे बुक करावे?',
+      te: 'రైలు టికెట్ ఆన్‌లైన్‌లో ఎలా బుక్ చేయాలి? (IRCTC & UTS)',
+      kn: 'ರೈಲು ಟಿಕೆಟ್ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಬುಕ್ ಮಾಡುವುದು ಹೇಗೆ? (IRCTC & UTS)',
+    },
+    department: {
+      ta: 'இந்திய ரயில்வே & ஐ.ஆர்.சி.டி.சி (Indian Railways / IRCTC)',
+      hi: 'भारतीय रेल एवं आईआरसीटीसी (Indian Railways / IRCTC)',
+      en: 'Indian Railway Catering and Tourism Corporation (IRCTC) / Indian Railways',
+    },
+    whatItHelps: {
+      ta: 'ரயில்வே ஸ்டேஷனில் நீண்ட வரிசையில் நிற்காமல், ஐ.ஆர்.சி.டி.சி (IRCTC Rail Connect) அல்லது UTS செயலி மூலம் ஊருக்குச் செல்ல முன்பதிவு பெட்டி (Sleeper/AC) மற்றும் லோக்கல் ரயில் டிக்கெட்டுகளை வீட்டிலிருந்தே எடுக்க உதவுகிறது.',
+      hi: 'रेलवे स्टेशन की लंबी लाइन में लगे बिना IRCTC ऐप या UTS ऐप से घर बैठे सुरक्षित ट्रेन टिकट (स्लीपर / 3AC / अनारक्षित) बुक करने की पूरी गाइड।',
+      en: 'Learn how to book reserved train tickets (Sleeper, 3AC, AC Chair Car) using the official IRCTC Rail Connect app and unreserved suburban tickets using UTS without waiting in long station counter lines.',
+    },
+    whoItIsFor: {
+      ta: 'குடும்பத்துடன் சொந்த ஊருக்கு செல்ல, அல்லது வேலை விஷயமாக ரயில் பயணம் செய்ய விரும்பும் பெண்கள் மற்றும் பயணிகள்.',
+      hi: 'यात्रा के लिए सुरक्षित व आसान ट्रेन टिकट बुक करने की इच्छुक महिलाएं व परिवार।',
+      en: 'Women, students, and families looking for safe, verified online railway ticket booking.',
+    },
+    eligibility: {
+      ta: [
+        'ஐ.ஆர்.சி.டி.சி (IRCTC) கணக்கு (இலவசமாக மொபைல் எண்ணை வைத்து தொடங்கலாம்).',
+        'புறப்படும் ரயில் நிலையம் மற்றும் சென்று சேரும் ரயில் நிலையம் பெயர்.',
+        'பயணிகள் பெயர், வயது மற்றும் பெட்டி விருப்பம் (ஸ்லீப்பர் / 3AC / மகளிர் கோட்டா).',
+        'பணம் செலுத்த: கூகுள் பே (GPay), போன்பே (PhonePe), பேடிஎம் அல்லது வங்கி டெபிட் கார்டு.',
+        'மொபைல் போனுக்கு வரும் 10 இலக்க PNR எண் மற்றும் SMS-ஐ ரயிலில் TTE-யிடம் காட்டினாலே போதுமானது; காகித பிரிண்ட் தேவையில்லை.',
+      ],
+      hi: [
+        'IRCTC अकाउंट (मोबाइल नंबर से 2 मिनट में फ्री रजिस्ट्रेशन)।',
+        'प्रस्थान स्टेशन और गंतव्य स्टेशन का नाम व यात्रा की तारीख।',
+        'यात्री का नाम, उम्र और सीट/बर्थ पसंद (स्लीपर / 3AC / लेडीज कोटा)।',
+        'भुगतान: Google Pay, PhonePe, Paytm अथवा डेबिट कार्ड।',
+        'फोन पर प्राप्त SMS / PNR नंबर ट्रेन में वैध होता है; पेपर प्रिंट की कोई जरूरत नहीं है।',
+      ],
+      en: [
+        'Free IRCTC user registration using your mobile number.',
+        'Origin station, destination station, and date of travel.',
+        'Passenger name, age, gender, and berth preference (Sleeper / 3AC / Ladies Quota).',
+        'Payment method: UPI (Google Pay, PhonePe, Paytm) or ATM Debit Card.',
+        'The 10-digit PNR SMS and Virtual ID received on your phone is 100% valid on the train; paper printout is NOT required.',
+      ],
+    },
+    documents: {
+      ta: [
+        'அரசு அடையாள அட்டை (ஆதார் / வாக்காளர் அட்டை - பயணத்தின் போது காட்ட)',
+        '10 இலக்க மொபைல் எண் (PNR டிக்கெட் SMS பெற)',
+        'UPI செயலி (GPay / PhonePe) அல்லது வங்கி அட்டை',
+      ],
+      hi: [
+        'सरकारी पहचान पत्र (आधार या वोटर कार्ड - यात्रा के समय)',
+        '10 अंकों का मोबाइल नंबर (PNR SMS प्राप्त करने हेतु)',
+        'UPI ऐप (Google Pay / PhonePe) अथवा बैंक कार्ड',
+      ],
+      en: [
+        'Govt ID proof (Aadhaar / Voter ID / Ration Card during train journey)',
+        '10-digit mobile number for PNR ticket SMS',
+        'UPI App (Google Pay / PhonePe) or Debit Card for payment',
+      ],
+    },
+    officialUrl: 'https://www.irctc.co.in',
+    officialSource: 'Indian Railway Catering and Tourism Corporation (www.irctc.co.in)',
+    sourceType: 'official',
+    verified: true,
+    lastVerified: 'Active 2026',
+    domainHierarchy: 'Ministry of Railways, Government of India (.co.in / .gov.in)',
+    primaryActionLabel: {
+      ta: 'ரயில் டிக்கெட் புக் செய்ய வழிகாட்டி 🚆',
+      hi: 'ट्रेन टिकट बुकिंग गाइड 🚆',
+      en: 'Guide Train Ticket Booking 🚆',
+    },
+    primaryActionType: 'do_it_with_me',
+    followupSuggestions: {
+      ta: [
+        'பெண்களுக்கான பிரத்யேக மகளிர் கோட்டா (Ladies Quota) எடுப்பது எப்படி?',
+        'உறுதி செய்யப்பட்ட டிக்கெட் கிடைக்கவில்லை என்றால் தட்கல் (Tatkal) டிக்கெட் எடுப்பது எப்படி?',
+        'லோக்கல் ரயில் டிக்கெட் எடுக்க UTS செயலியை பயன்படுத்துவது எப்படி?',
+      ],
+      hi: [
+        'महिलाओं के लिए लेडीज कोटा में टिकट कैसे बुक करें?',
+        'वेटिंग लिस्ट टिकट कन्फर्म न होने पर तत्काल कैसे लें?',
+        'लोकल ट्रेन के लिए UTS ऐप कैसे इस्तेमाल करें?',
+      ],
+      en: [
+        'How to book tickets under Ladies Quota for women travelers?',
+        'How to book Tatkal tickets if seats are full?',
+        'How to use the UTS app for unreserved local train tickets?',
+      ],
+    },
+    steps: {
+      ta: [
+        {
+          stepNumber: 1,
+          totalSteps: 5,
+          title: 'IRCTC Rail Connect செயலியை திறக்கவும்',
+          instruction: 'உங்கள் மொபைல் போனில் கூகுள் ப்ளே ஸ்டோரிலிருந்து "IRCTC Rail Connect" செயலியை பதிவிறக்கம் செய்து, உங்கள் 4 இலக்க PIN அல்லது கடவுச்சொல் மூலம் உள்நுழையவும்.',
+          simplifiedInstruction: 'ப்ளே ஸ்டோரில் "IRCTC" செயலியை திறந்து உங்கள் பாஸ்வேர்டு போட்டு உள்ளே செல்லுங்கள்.',
+          example: 'புதிய பயனராக இருந்தால் "Register User" தொட்டு மொபைல் எண் மற்றும் ஆதார் மூலம் பதிவு செய்யலாம்.',
+          actionType: 'external_handoff',
+          options: ['செயலியை திறந்துவிட்டேன்'],
+          badge: 'படி 1 / 5',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 5,
+          title: 'புறப்படும் இடம் மற்றும் சென்று சேரும் இடம் தேர்வு',
+          instruction: '"Book Ticket" என்பதை தொட்டு, புறப்படும் ரயில் நிலையம் (From), சென்று சேரும் ரயில் நிலையம் (To), மற்றும் பயண தேதியை (Journey Date) தேர்வு செய்து "Search Trains" கொடுக்கவும்.',
+          simplifiedInstruction: 'எந்த ஊரில் இருந்து எந்த ஊருக்கு, என்ன தேதியில் செல்ல வேண்டும் என்பதை தேர்வு செய்யுங்கள்.',
+          example: 'எ.கா: From: சென்னை (MAS), To: மதுரை (MDU), தேதி: அடுத்த வெள்ளிக்கிழமை.',
+          actionType: 'input',
+          mockInputLabel: 'ரயில் நிலையங்கள் & தேதி',
+          mockInputPlaceholder: 'சென்னை ➔ மதுரை, 15 ஏப்ரல்',
+          badge: 'படி 2 / 5',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 5,
+          title: 'ரயில் மற்றும் பெட்டி வகுப்பு (Class) தேர்வு',
+          instruction: 'திரையில் தோன்றும் ரயில்களில் உங்களுக்கு வசதியான நேரத்தை தேர்வு செய்து, ஸ்லீப்பர் (SL), 3AC (3A), அல்லது 2S வகுப்பை தேர்வு செய்யவும். பச்சை நிறத்தில் "Available" உள்ளதை உறுதி செய்யுங்கள்.',
+          simplifiedInstruction: 'பச்சை நிறத்தில் இடம் உள்ள ரயிலையும், ஸ்லீப்பர் அல்லது ஏசி வகுப்பையும் தொடுங்கள்.',
+          example: 'பச்சை நிறத்தில் "AVL 42" என்று இருந்தால் இருக்கை கிடைக்கும்.',
+          actionType: 'select',
+          options: ['ஸ்லீப்பர் வகுப்பு (Sleeper - SL)', 'ஏசி 3-டயர் (AC 3 Tier - 3A)', '2-ஆம் வகுப்பு இருக்கை (Second Sitting - 2S)'],
+          badge: 'படி 3 / 5',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 5,
+          title: 'பயணிகள் விவரங்களை பதிவு செய்தல்',
+          instruction: '"Add New Passenger" என்பதை தொட்டு, உங்கள் பெயர், வயது, பாலினம் மற்றும் இருக்கை விருப்பத்தை (கீழ் படுக்கை - Lower Berth / நடுத்தர படுக்கை - Middle Berth) உள்ளிடவும்.',
+          simplifiedInstruction: 'பயணம் செய்பவர்களின் பெயர், வயது மற்றும் கீழ் படுக்கை வேண்டுமா என்பதை குறித்துக் கொள்ளுங்கள்.',
+          example: 'பெண்கள் தனியாக பயணம் செய்தால் "Ladies Quota" தேர்வு செய்யலாம்.',
+          actionType: 'input',
+          mockInputLabel: 'பயணி பெயர் & வயது',
+          mockInputPlaceholder: 'பெயர்: கவிதா, வயது: 34, பெர்த்: Lower',
+          badge: 'படி 4 / 5',
+        },
+        {
+          stepNumber: 5,
+          totalSteps: 5,
+          title: 'பாதுகாப்பான UPI கட்டணம் & PNR பெறுதல்',
+          instruction: 'BHIM/UPI வழியே கூகுள் பே (GPay) அல்லது போன்பே (PhonePe) தேர்வு செய்து பணம் செலுத்தவும். பணம் செலுத்தியதும் 10 இலக்க PNR எண்ணுடன் கூடிய டிக்கெட் உங்கள் போனுக்கு SMS மற்றும் வாட்ஸ்அப்பில் உடனடியாக வரும்!',
+          simplifiedInstruction: 'கூகுள் பே அல்லது போன்பேவில் பணம் செலுத்துங்கள். உடனே போனுக்கு PNR டிக்கெட் மெசேஜ் வரும்.',
+          example: 'ரயிலில் பயணம் செய்யும்போது இந்த மெசேஜையும் ஆதாரையும் காட்டினாலே போதும்!',
+          actionType: 'external_handoff',
+          options: ['டிக்கெட் புக் செய்யப்பட்டது! PNR வந்துவிட்டது'],
+          badge: 'படி 5 / 5',
+        },
+      ],
+      hi: [
+        {
+          stepNumber: 1,
+          totalSteps: 5,
+          title: 'IRCTC Rail Connect ऐप खोलें',
+          instruction: 'अपने मोबाइल में "IRCTC Rail Connect" ऐप डाउनलोड करें और अपना यूजरनेम और पिन दर्ज करके लॉग इन करें।',
+          simplifiedInstruction: 'IRCTC ऐप खोलें और 4 अंकों का पिन डालकर लॉगिन करें।',
+          example: 'यदि खाता नहीं है, तो "Register User" पर टैप करें।',
+          actionType: 'external_handoff',
+          options: ['ऐप खुल गया'],
+          badge: 'कदम 1 / 5',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 5,
+          title: 'स्टेशन और यात्रा की तारीख चुनें',
+          instruction: '"Train" ➔ "Book Ticket" पर टैप करें। कहाँ से (From), कहाँ तक (To) जाना है और किस तारीख को जाना है, यह दर्ज करके "Search Trains" दबाएं।',
+          simplifiedInstruction: 'किस स्टेशन से किस स्टेशन तक जाना है, और यात्रा की तारीख चुनें।',
+          example: 'जैसे: नई दिल्ली ➔ वाराणसी, 15 अप्रैल।',
+          actionType: 'input',
+          mockInputLabel: 'स्टेशन व तारीख',
+          mockInputPlaceholder: 'नई दिल्ली ➔ लखनऊ',
+          badge: 'कदम 2 / 5',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 5,
+          title: 'ट्रेन और क्लास (Sleeper / 3AC) चुनें',
+          instruction: 'अपनी पसंदीदा ट्रेन और समय देखें। स्लीपर (SL) या 3AC पर टैप करें। जब हरा रंग "Available" दिखे तो उस पर टैप करें।',
+          simplifiedInstruction: 'ट्रेन और स्लीपर या 3AC डिब्बा चुनें जिसमें सीट खाली (हरा रंग) हो।',
+          example: 'हरा "AVL 25" का मतलब सीट उपलब्ध है।',
+          actionType: 'select',
+          options: ['स्लीपर क्लास (Sleeper - SL)', 'एसी 3-टियर (AC 3 Tier - 3A)', 'चेयर कार (Chair Car - CC)'],
+          badge: 'कदम 3 / 5',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 5,
+          title: 'यात्री का नाम और उम्र भरें',
+          instruction: '"Add Passenger" पर टैप करके यात्री का नाम, उम्र और लिंग भरें। बर्थ पसंद (निचली सीट Lower या Side Lower) चुनें।',
+          simplifiedInstruction: 'यात्री का नाम, उम्र लिखें और यदि निचली सीट चाहिए तो Lower Berth चुनें।',
+          example: 'नाम: सुनीता, उम्र: 45, सीट: Lower',
+          actionType: 'input',
+          mockInputLabel: 'यात्री विवरण',
+          mockInputPlaceholder: 'सुनीता, 45 वर्ष, Lower',
+          badge: 'कदम 4 / 5',
+        },
+        {
+          stepNumber: 5,
+          totalSteps: 5,
+          title: 'UPI से सुरक्षित भुगतान करें और PNR प्राप्त करें',
+          instruction: 'BHIM/UPI (Google Pay / PhonePe / Paytm) चुनकर भुगतान करें। तुरंत 10 अंकों का PNR नंबर वाला कन्फर्म टिकट SMS और WhatsApp पर आ जाएगा।',
+          simplifiedInstruction: 'Google Pay या PhonePe से भुगतान करें। मोबाइल पर 10 अंकों का PNR टिकट तुरंत आएगा।',
+          example: 'सफर के समय केवल यह SMS और आधार कार्ड टीटीई (TTE) को दिखाएं।',
+          actionType: 'external_handoff',
+          options: ['टिकट बुक हो गया! PNR मिल गया'],
+          badge: 'कदम 5 / 5',
+        },
+      ],
+      en: [
+        {
+          stepNumber: 1,
+          totalSteps: 5,
+          title: 'Open the IRCTC Rail Connect App',
+          instruction: 'Open the official "IRCTC Rail Connect" mobile app or visit irctc.co.in. Log in using your 4-digit App PIN or username and password.',
+          simplifiedInstruction: 'Open the IRCTC app and log in with your PIN.',
+          example: 'If you are a new user, tap "Register User" to sign up with your mobile number.',
+          actionType: 'external_handoff',
+          options: ['App is open'],
+          badge: 'Step 1 of 5',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 5,
+          title: 'Choose Departure, Destination, and Journey Date',
+          instruction: 'Tap "Train" ➔ "Book Ticket". Enter your origin station in "From", destination in "To", pick your travel date, and tap "Search Trains".',
+          simplifiedInstruction: 'Select where you are traveling from, where you are going, and the travel date.',
+          example: 'e.g. From: New Delhi (NDLS), To: Varanasi (BSB), Date: 20 April.',
+          actionType: 'input',
+          mockInputLabel: 'Origin & Destination',
+          mockInputPlaceholder: 'Chennai Central ➔ Madurai Junction',
+          badge: 'Step 2 of 5',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 5,
+          title: 'Select Train and Class (Sleeper / 3AC / Chair Car)',
+          instruction: 'Browse available trains and timings. Tap on your preferred class (Sleeper SL, 3rd AC 3A, or 2S). Look for green text indicating "Available".',
+          simplifiedInstruction: 'Pick the train and class that shows green "Available" seats.',
+          example: 'Green "AVL 54" means seats are confirmed and ready to book.',
+          actionType: 'select',
+          options: ['Sleeper Class (SL)', 'AC 3 Tier (3A)', 'Second Sitting (2S)', 'AC Chair Car (CC)'],
+          badge: 'Step 3 of 5',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 5,
+          title: 'Enter Passenger Details & Berth Choice',
+          instruction: 'Tap "Add New Passenger". Enter the full passenger name, age, gender, and select your berth preference (Lower Berth, Middle, Upper, or Side Lower).',
+          simplifiedInstruction: 'Enter traveler name, age, and choose your preferred seat.',
+          example: 'Women travelling alone can select "Ladies Quota" for dedicated female berths.',
+          actionType: 'input',
+          mockInputLabel: 'Passenger Details',
+          mockInputPlaceholder: 'Name: Kavitha, Age: 34, Preference: Lower',
+          badge: 'Step 4 of 5',
+        },
+        {
+          stepNumber: 5,
+          totalSteps: 5,
+          title: 'Pay via UPI (GPay/PhonePe) & Receive 10-Digit PNR',
+          instruction: 'Select BHIM/UPI to pay without convenience surcharges using Google Pay, PhonePe, or Paytm. Your confirmed 10-digit PNR ticket arrives immediately on SMS and WhatsApp!',
+          simplifiedInstruction: 'Pay via Google Pay or PhonePe. Your confirmed PNR SMS ticket arrives immediately.',
+          example: 'Show this SMS and your Aadhaar/Voter ID to the train ticket examiner (TTE) during travel.',
+          actionType: 'external_handoff',
+          options: ['Ticket Booked Successfully with PNR!'],
+          badge: 'Step 5 of 5',
+        },
+      ],
+    },
+  },
+
+  // 4. ONLINE BOOKING: Cinema Ticket Online Booking
   {
     id: 'cinema-ticket-booking',
     category: 'booking',
@@ -1493,6 +1772,678 @@ export const UNIVERSAL_RESOURCES: Resource[] = [
       en: [],
     },
   },
+
+  // 10. GOVERNMENT SERVICES: Government Certificates (Income, Community, Nativity, e-Sevai)
+  {
+    id: 'service-government-certificate',
+    category: 'services',
+    taskType: 'government',
+    mode: 'guided',
+    title: {
+      ta: 'அரசு சான்றிதழ்கள் & இ-சேவை வழிகாட்டி (வருமானம், சாதி, இருப்பிடம்)',
+      hi: 'सरकारी प्रमाण पत्र आवेदन मार्गदर्शिका (ई-सेवा / TNeGA)',
+      en: 'Government Certificates Application Guide (Income, Community, Nativity)',
+      mr: 'शासकीय प्रमाणपत्रे अर्ज व ई-सेवा केंद्र मार्गदर्शिका',
+      te: 'ప్రభుత్వ ధృవీకరణ పత్రాల దరఖాస్తు మార్గదర్శి (ఈ-సేవ)',
+      kn: 'ಸರ್ಕಾರಿ ಪ್ರಮಾಣಪತ್ರಗಳ ಅರ್ಜಿ ಮತ್ತು ಇ-ಸೇವೆ ಮಾರ್ಗದರ್ಶಿ',
+    },
+    department: {
+      ta: 'வருவாய்த் துறை & தமிழ்நாடு மின்னாளுமை முகமை (TNeGA)',
+      hi: 'राजस्व विभाग एवं ई-गवर्नेंस एजेंसी (TNeGA)',
+      en: 'Revenue Department & Tamil Nadu e-Governance Agency (TNeGA)',
+      mr: 'महसूल विभाग व ई-शासन',
+      te: 'రెవెన్యూ శాఖ & ఈ-గవర్నెన్స్',
+      kn: 'ಕಂದಾಯ ಇಲಾಖೆ ಮತ್ತು ಇ-ಆಡಳಿತ',
+    },
+    whatItHelps: {
+      ta: 'வருமானச் சான்றிதழ், சாதிச் சான்றிதழ், இருப்பிடச் சான்றிதழ் மற்றும் பிற அரசு சான்றிதழ்களை அருகிலுள்ள இ-சேவை மையம் அல்லது ஆன்லைன் மூலமாக எளிதாக விண்ணப்பித்து பெற வழிகாட்டுகிறது.',
+      hi: 'आय प्रमाण पत्र, जाति प्रमाण पत्र, निवास प्रमाण पत्र जैसे सभी सरकारी प्रमाण पत्रों के लिए नजदीकी ई-सेवा केंद्र या ऑनलाइन पोर्टल से आवेदन करने का सीधा मार्गदर्शन।',
+      en: 'Guides you to easily apply for and obtain Income Certificate, Community Certificate, Nativity Certificate, and First Graduate Certificate via nearby authorized e-Sevai centres or online.',
+    },
+    whoItIsFor: {
+      ta: 'பள்ளி, கல்லூரி சேர்க்கை, அரசு நலத்திட்டங்கள் மற்றும் வேலைவாய்ப்பிற்கு சான்றிதழ் தேவைப்படும் பொதுமக்கள்.',
+      hi: 'स्कूल, कॉलेज प्रवेश या सरकारी योजनाओं हेतु प्रमाण पत्र चाहने वाले सभी नागरिक व छात्र।',
+      en: 'All citizens, students, and families requiring verified government revenue certificates.',
+    },
+    eligibility: {
+      ta: [
+        'தமிழ்நாடு வாழ் குடிமக்கள் அனைவரும் விண்ணப்பிக்கலாம்.',
+        'தேவையான ஆவணங்களுடன் அருகிலுள்ள இ-சேவை மையத்தை அணுகலாம் அல்லது tnesevai.tn.gov.in தளத்தில் பதிவு செய்யலாம்.',
+        'விண்ணப்பித்த பின் 7 முதல் 15 வேலை நாட்களுக்குள் சான்றிதழ் தயாராகிவிடும்.',
+      ],
+      hi: [
+        'कोई भी नागरिक जिसे सरकारी प्रमाण पत्र की आवश्यकता है।',
+        'आवश्यक दस्तावेजों के साथ नजदीकी ई-सेवा केंद्र जाएं या ऑनलाइन आवेदन करें।',
+        'आवेदन के 7 से 15 दिनों के भीतर डिजिटल हस्ताक्षरित प्रमाण पत्र तैयार हो जाता है।',
+      ],
+      en: [
+        'Any bonafide resident or student requiring official certified revenue documentation.',
+        'Apply online at tnesevai.tn.gov.in or in-person at nearest authorized e-Sevai / CSC centre.',
+        'Digitally signed certificates are typically issued within 7 to 15 working days after Tahsildar approval.',
+      ],
+    },
+    documents: {
+      ta: [
+        'ஆதார் அட்டை (Aadhaar Card)',
+        'ஸ்மார்ட் குடும்ப அட்டை (Smart Ration Card)',
+        'பாஸ்போர்ட் அளவு புகைப்படம்',
+        'வருமான ஆதார ஆவணம் (சம்பளச் சீட்டு அல்லது VAO சான்று)',
+      ],
+      hi: [
+        'आधार कार्ड',
+        'राशन कार्ड',
+        'पासपोर्ट साइज फोटो',
+        'आय का प्रमाण (वेतन पर्ची या पटवारी रिपोर्ट)',
+      ],
+      en: [
+        'Aadhaar Card copy',
+        'Smart Family Ration Card',
+        'Passport-size photograph',
+        'Income proof (Salary slip / VAO verification / Bank statement)',
+      ],
+    },
+    officialSource: 'Tamil Nadu e-Governance Agency (tnesevai.tn.gov.in)',
+    officialSourceName: 'Tamil Nadu e-Governance Agency (tnesevai.tn.gov.in)',
+    officialUrl: 'https://www.tnesevai.tn.gov.in',
+    sourceType: 'official',
+    verified: true,
+    domainHierarchy: 'Information Technology & Digital Services Dept, Govt. of Tamil Nadu (.gov.in)',
+    lastVerified: 'Active 2026',
+    primaryActionType: 'do_it_with_me',
+    primaryActionLabel: {
+      ta: 'சான்றிதழுக்கு விண்ணப்பிக்க (Apply Certificate)',
+      hi: 'प्रमाण पत्र के लिए आवेदन करें (Apply Certificate)',
+      en: 'Apply for Certificate Step by Step',
+    },
+    steps: {
+      ta: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'தேவையான சான்றிதழை தேர்வு செய்தல்',
+          instruction: 'வருமானம், சாதி, இருப்பிடம் அல்லது முதல் பட்டதாரி சான்றிதழில் உங்களுக்கு எது தேவை என்பதை முடிவு செய்யுங்கள்.',
+          simplifiedInstruction: 'பயப்பட வேண்டாம். உங்களுக்கு என்ன சான்றிதழ் வேண்டும் என்பதை மட்டும் முதலில் முடிவு செய்வோம்.',
+          example: 'உதாரணம்: பள்ளி, கல்லூரி உதவித்தொகைக்கு வருமானச் சான்றிதழ் அவசியம்.',
+          actionType: 'select',
+          options: ['சான்றிதழ் தேவை புரிந்தது', 'கூடுதல் உதவி தேவை'],
+          badge: 'படி 1 / 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'ஆதார் மற்றும் ரேஷன் கார்டை தயாராக வைத்தல்',
+          instruction: 'உங்கள் ஆதார் அட்டை, ஸ்மார்ட் ரேஷன் கார்டு மற்றும் பாஸ்போர்ட் போட்டோவை எடுத்துக்கொள்ளுங்கள்.',
+          simplifiedInstruction: 'உங்கள் ஆதார் கார்டும் ரேஷன் கார்டும் மட்டும் கையில் இருந்தால் போதும்.',
+          example: 'உதாரணம்: இரண்டிலும் பெயர் மற்றும் முகவரி சரியாக இருப்பதை உறுதி செய்யுங்கள்.',
+          actionType: 'select',
+          options: ['ஆவணங்கள் என்னிடம் உள்ளன'],
+          badge: 'படி 2 / 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'அருகிலுள்ள இ-சேவை மையத்தில் விண்ணப்பித்தல்',
+          instruction: 'அருகிலுள்ள இ-சேவை (e-Sevai) மையம் சென்று ஆவணங்களை ஸ்கேன் செய்து இணையத்தில் பதிவு செய்யுங்கள்.',
+          simplifiedInstruction: 'இ-சேவை மையத்திற்கு சென்று "எனக்கு அரசு சான்றிதழ் வேண்டும்" என்று கூறினாலே ஆப்பரேட்டர் பதிவு செய்வார்.',
+          example: 'உதாரணம்: தாலுகா அலுவலகம் அல்லது கிராம நிர்வாக அலுவலர் (VAO) அருகில் உள்ள மையம்.',
+          actionType: 'confirm_details',
+          options: ['இ-சேவை செல்ல தயாராக இருக்கிறேன்'],
+          badge: 'படி 3 / 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'ஒப்புகை சீட்டு மற்றும் சான்றிதழ் பதிவிறக்கம்',
+          instruction: 'விண்ணப்ப எண் (Application Reference ID) அடங்கிய ஒப்புகை ரசீதை பத்திரமாக வைத்துக்கொள்ளவும்.',
+          simplifiedInstruction: 'அவர்கள் தரும் ஒப்புகை எண்ணை குறித்து வையுங்கள். ஒப்புதல் கிடைத்ததும் சான்றிதழை பிரிண்ட் எடுக்கலாம்.',
+          example: 'உதாரணம்: TN-72026... என்ற எண் மொபைல் SMS-ல் வரும்.',
+          actionType: 'external_handoff',
+          options: ['முழு வழிகாட்டலையும் புரிந்துகொண்டேன்'],
+          badge: 'படி 4 / 4',
+        },
+      ],
+      hi: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'आवश्यक प्रमाण पत्र चुनें',
+          instruction: 'तय करें कि आपको आय प्रमाण पत्र, जाति प्रमाण पत्र या निवास प्रमाण पत्र में से क्या चाहिए।',
+          simplifiedInstruction: 'बस यह चुन लें कि आपको कौन सा प्रमाण पत्र बनवाना है।',
+          example: 'उदाहरण: छात्रवृत्ति के लिए आय प्रमाण पत्र जरूरी होता है।',
+          actionType: 'select',
+          options: ['प्रमाण पत्र समझ आ गया'],
+          badge: 'कदम 1 / 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'आधार व राशन कार्ड साथ रखें',
+          instruction: 'आधार कार्ड, राशन कार्ड और पासपोर्ट साइज फोटो तैयार रखें।',
+          simplifiedInstruction: 'बस आधार कार्ड और राशन कार्ड संभाल कर रख लें।',
+          example: 'उदाहरण: दोनों में नाम सही होना चाहिए।',
+          actionType: 'select',
+          options: ['दस्तावेज तैयार हैं'],
+          badge: 'कदम 2 / 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'ई-सेवा केंद्र में आवेदन करें',
+          instruction: 'नजदीकी ई-सेवा (e-Sevai / CSC) केंद्र जाकर ऑनलाइन आवेदन जमा कराएं।',
+          simplifiedInstruction: 'ई-सेवा केंद्र जाकर ऑपरेटर को कागजात दें, वे ऑनलाइन फॉर्म भर देंगे।',
+          example: 'उदाहरण: ब्लॉक ऑफिस या पंचायत भवन के पास ई-सेवा केंद्र मिल जाएगा।',
+          actionType: 'confirm_details',
+          options: ['आवेदन करने को तैयार हूँ'],
+          badge: 'कदम 3 / 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'आवेदन रसीद संभालें व प्रमाण पत्र पाएं',
+          instruction: 'आवेदन रसीद संख्या नोट कर लें। अनुमोदन के बाद डिजिटल प्रमाण पत्र प्राप्त करें।',
+          simplifiedInstruction: 'SMS पर आया आवेदन नंबर लिख लें, कुछ दिनों में प्रमाण पत्र मिल जाएगा।',
+          example: 'उदाहरण: एप्लीकेशन रेफरेंस नंबर।',
+          actionType: 'external_handoff',
+          options: ['सब समझ आ गया'],
+          badge: 'कदम 4 / 4',
+        },
+      ],
+      en: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'Identify Required Certificate',
+          instruction: 'Decide which Revenue certificate you require: Income, Community, Nativity, or First Graduate.',
+          simplifiedInstruction: 'Decide which certificate you need. HARSHU will guide you through the requirements.',
+          example: 'Example: Income Certificate is essential for government scholarships.',
+          actionType: 'select',
+          options: ['I know which certificate I need'],
+          badge: 'Step 1 of 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'Keep Aadhaar & Family Ration Card Ready',
+          instruction: 'Ensure you have the applicant’s Aadhaar card copy, Smart Ration card, and a recent photo.',
+          simplifiedInstruction: 'Keep your Aadhaar card and Ration card handy in a folder.',
+          example: 'Example: Ensure spellings match on both cards.',
+          actionType: 'select',
+          options: ['Documents are ready'],
+          badge: 'Step 2 of 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'Apply via Nearest e-Sevai Centre or Online Portal',
+          instruction: 'Visit your nearest authorized e-Sevai / CSC centre or log in to tnesevai.tn.gov.in.',
+          simplifiedInstruction: 'Visit your nearest citizen service centre where the operator scans documents and submits.',
+          example: 'Example: Located near the Taluk or Village Administrative Office.',
+          actionType: 'confirm_details',
+          options: ['Ready to visit e-Sevai centre'],
+          badge: 'Step 3 of 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'Track Reference ID & Download Digitally Signed Certificate',
+          instruction: 'Keep the SMS with your Application Reference Number. Download once verified by Revenue authorities.',
+          simplifiedInstruction: 'Save your SMS tracking number. Print your digitally signed certificate once approved.',
+          example: 'Example: An SMS with Application Reference ID is received.',
+          actionType: 'external_handoff',
+          options: ['Understood clearly, ready to proceed'],
+          badge: 'Step 4 of 4',
+        },
+      ],
+    },
+  },
+
+  // 11. SKILLS & LEARNING: Free Vocational & Skill Development Courses for Women
+  {
+    id: 'skills-learn-free',
+    category: 'skills',
+    taskType: 'government',
+    mode: 'guided',
+    title: {
+      ta: 'பெண்களுக்கான இலவச தொழிற்கல்வி & திறன் பயிற்சிகள் (TNSDC & PMKVY)',
+      hi: 'महिलाओं के लिए मुफ्त कौशल विकास और व्यावसायिक प्रशिक्षण (TNSDC & PMKVY)',
+      en: 'Free Skill Development & Vocational Training for Women (TNSDC & PMKVY)',
+      mr: 'महिलांसाठी मोफत कौशल्य प्रशिक्षण व व्यावसायिक कोर्सेस',
+      te: 'మహిళలకు ఉచిత వృత్తి నైపుణ్య శిక్షణ మరియు సర్టిఫికేషన్',
+      kn: 'ಮಹಿಳೆಯರಿಗೆ ಉಚಿತ ಕೌಶಲ್ಯ ತರಬೇತಿ ಮತ್ತು ಸ್ವಯಂ ಉದ್ಯೋಗ',
+    },
+    department: {
+      ta: 'தமிழ்நாடு திறன் மேம்பாட்டுக் கழகம் & மத்திய திறன் மேம்பாட்டு அமைச்சகம்',
+      hi: 'कौशल विकास एवं उद्यमिता मंत्रालय तथा राज्य कौशल विकास निगम',
+      en: 'Skill Development Mission (TNSDC & PMKVY), Govt. of Tamil Nadu / India',
+      mr: 'कौशल्य विकास मंत्रालय',
+      te: 'నైపుణ్యాభివృద్ధి శాఖ',
+      kn: 'ಕೌಶಲ್ಯ ಅಭಿವೃದ್ಧಿ ಇಲಾಖೆ',
+    },
+    whatItHelps: {
+      ta: 'தையல் கலை, கணினி அறிவு, அழகுக்கலை, மற்றும் கைவினைப் பொருட்களில் முற்றிலும் இலவச பயிற்சி, இலவச உபகரணங்கள் மற்றும் அரசு சான்றிதழுடன் கூடிய வேலைவாய்ப்பு வழிகாட்டுதல்.',
+      hi: 'सिलाई, कंप्यूटर ज्ञान, ब्यूटीशियन और हस्तशिल्प में 100% मुफ्त सरकारी प्रशिक्षण, निःशुल्क टूलकिट और मान्यता प्राप्त प्रमाण पत्र।',
+      en: 'Provides 100% free certified vocational courses in Tailoring & Garment Making, Computer & Digital Skills, Beautician & Wellness, and Handicrafts with toolkit incentives and placement support.',
+    },
+    whoItIsFor: {
+      ta: 'சுயதொழில் தொடங்க அல்லது வேலை வாய்ப்பு பெற விரும்பும் 18 முதல் 35 வயதுக்குட்பட்ட பெண்கள்.',
+      hi: '18 से 35 वर्ष की महिलाएं जो आत्मनिर्भर बनकर घर से या स्थानीय स्तर पर कमाई करना चाहती हैं।',
+      en: 'Women aged 18 and above looking to build practical livelihood skills for self-employment or localized jobs.',
+    },
+    eligibility: {
+      ta: [
+        '18 வயது நிரம்பிய பெண்கள் விண்ணப்பிக்கலாம்.',
+        'பள்ளி படிப்பு முடித்த அல்லது பாதியில் நின்ற பெண்களும் சேரலாம்.',
+        'பயிற்சி காலத்தில் இலவச உபகரணங்கள், கையேடுகள் மற்றும் அரசு சான்றிதழ் வழங்கப்படும்.',
+      ],
+      hi: [
+        'न्यूनतम आयु 18 वर्ष पूरी हो चुकी हो।',
+        'स्कूल पास या पढ़ाई छोड़ चुकी महिलाएं भी पात्र हैं।',
+        'कोर्स पूरी तरह निःशुल्क है और सरकारी प्रमाण पत्र मिलता है।',
+      ],
+      en: [
+        'Women aged 18 and above.',
+        'Open to 8th/10th/12th pass students or school leavers.',
+        'Zero tuition fees, free training materials, and government-recognized NSQF certification.',
+      ],
+    },
+    documents: {
+      ta: [
+        'ஆதார் அட்டை நகல் (Aadhaar Card)',
+        'பள்ளி மாற்றுச் சான்றிதழ் அல்லது 8/10/12 மதிப்பெண் பட்டியல்',
+        'வங்கி சேமிப்பு கணக்கு புத்தகம்',
+        '2 பாஸ்போர்ட் அளவு புகைப்படங்கள்',
+      ],
+      hi: [
+        'आधार कार्ड की प्रति',
+        'स्कूल मार्कशीट या टीसी',
+        'बैंक खाता पासबुक',
+        '2 पासपोर्ट साइज फोटो',
+      ],
+      en: [
+        'Aadhaar Card copy',
+        'School Marksheet / Transfer Certificate (8th, 10th, or 12th)',
+        'Bank Account Passbook copy',
+        '2 Passport-size photographs',
+      ],
+    },
+    officialSource: 'Tamil Nadu Skill Development Corporation (tnsdc.tn.gov.in)',
+    officialSourceName: 'Tamil Nadu Skill Development Corporation (tnsdc.tn.gov.in)',
+    officialUrl: 'https://tnsdc.tn.gov.in',
+    sourceType: 'official',
+    verified: true,
+    domainHierarchy: 'Department of Skill Development & Employment, Govt. of Tamil Nadu (.gov.in)',
+    lastVerified: 'Active 2026',
+    primaryActionType: 'do_it_with_me',
+    primaryActionLabel: {
+      ta: 'இலவச பயிற்சியில் சேர வழிகாட்டு (Enroll Free Training)',
+      hi: 'मुफ्त कोर्स में दाखिला लें (Enroll Free Training)',
+      en: 'Enroll in Free Skill Training',
+    },
+    steps: {
+      ta: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'விருப்பமான திறன் பயிற்சியை தேர்வு செய்தல்',
+          instruction: 'தையல், கணினி, அழகுக்கலை அல்லது கைவினைப் பொருட்களில் உங்கள் ஆர்வத்திற்குரிய துறையை தேர்ந்தெடுங்கள்.',
+          simplifiedInstruction: 'உங்களுக்கு என்ன வேலை கற்க பிடிக்கும் என்று முடிவு செய்யுங்கள் — தையலா, கம்ப்யூட்டரா அல்லது பியூட்டிசியனா?',
+          example: 'உதாரணம்: வீட்டில் இருந்து செய்ய தையல் அல்லது கைவினைப் பொருட்கள் மிகவும் ஏற்றது.',
+          actionType: 'select',
+          options: ['துறையை தேர்வு செய்துவிட்டேன்'],
+          badge: 'படி 1 / 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'ஆதார் மற்றும் கல்வி சான்றிதழை தயார் செய்தல்',
+          instruction: 'ஆதார் அட்டை நகல், பள்ளி மாற்றுச் சான்றிதழ் மற்றும் 2 போட்டோக்களை எடுத்து வையுங்கள்.',
+          simplifiedInstruction: 'உங்கள் ஆதார் கார்டும் பழைய பள்ளி மார்க்ஷீட்டும் மட்டும் எடுத்து வையுங்கள்.',
+          example: 'உதாரணம்: இவற்றை ஒரு கவரில் பத்திரமாக எடுத்துக்கொள்ளுங்கள்.',
+          actionType: 'select',
+          options: ['ஆவணங்கள் தயாராக உள்ளன'],
+          badge: 'படி 2 / 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'அருகிலுள்ள அரசு பயிற்சி மையத்தை அணுகுதல்',
+          instruction: 'உங்கள் தாலுகா அல்லது மாவட்டத்திலுள்ள அரசு திறன் மேம்பாட்டு மையம் (TNSDC / PMKVY Center) செல்லுங்கள்.',
+          simplifiedInstruction: 'உங்கள் ஊரில் உள்ள அரசு திறன் பயிற்சி மையத்திற்கு நேரில் சென்று பதிவு செய்யுங்கள்.',
+          example: 'உதாரணம்: மாவட்ட வேலைவாய்ப்பு அலுவலகம் அல்லது அரசு ஐடிஐ அருகில் மையம் இருக்கும்.',
+          actionType: 'confirm_details',
+          options: ['மையம் செல்ல தயாராக இருக்கிறேன்'],
+          badge: 'படி 3 / 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'சான்றிதழுடன் கூடிய வேலைவாய்ப்பு / சுயதொழில் தொடங்குதல்',
+          instruction: 'பயிற்சியை வெற்றிகரமாக முடித்து அரசு சான்றிதழும், தொழில் தொடங்க வழிகாட்டலும் பெறுங்கள்.',
+          simplifiedInstruction: 'பயிற்சி முடிந்ததும் அரசு சான்றிதழ் தருவார்கள். சொந்தமாக தொழில் செய்து வருமானம் ஈட்டலாம்.',
+          example: 'உதாரணம்: தேசிய அளவில் செல்லுபடியாகும் அரசு சான்றிதழ்.',
+          actionType: 'external_handoff',
+          options: ['தெளிவாக புரிந்துகொண்டேன்'],
+          badge: 'படி 4 / 4',
+        },
+      ],
+      hi: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'मनपसंद हुनर चुनें',
+          instruction: 'सिलाई, कंप्यूटर, ब्यूटीशियन या हस्तशिल्प में से अपनी रुचि का कोर्स चुनें।',
+          simplifiedInstruction: 'सोच लें कि आप क्या सीखना चाहती हैं — सिलाई, कंप्यूटर या ब्यूटीशियन?',
+          example: 'उदाहरण: घर से काम के लिए सिलाई या हैंडीक्राफ्ट सबसे उत्तम है।',
+          actionType: 'select',
+          options: ['कोर्स चुन लिया'],
+          badge: 'कदम 1 / 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'आधार व स्कूल प्रमाण पत्र साथ रखें',
+          instruction: 'आधार कार्ड, अंतिम कक्षा की मार्कशीट और 2 फोटो संभाल कर रखें।',
+          simplifiedInstruction: 'बस आधार कार्ड और पुरानी मार्कशीट की फोटोकॉपी पास रखें।',
+          example: 'उदाहरण: एक साफ फाइल में सुरक्षित रख लें।',
+          actionType: 'select',
+          options: ['दस्तावेज तैयार हैं'],
+          badge: 'कदम 2 / 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'नजदीकी सरकारी कौशल केंद्र में पंजीकरण',
+          instruction: 'अपने जिले के सरकारी कौशल विकास केंद्र (PMKVY / ITI) में संपर्क करें।',
+          simplifiedInstruction: 'नजदीकी सरकारी केंद्र पर जाकर मुफ्त बैच में नाम लिखवाएं।',
+          example: 'उदाहरण: जिला रोजगार कार्यालय या सरकारी आईटीआई के पास।',
+          actionType: 'confirm_details',
+          options: ['पंजीकरण हेतु तैयार हूँ'],
+          badge: 'कदम 3 / 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'प्रशिक्षण पूरा कर प्रमाण पत्र पाएं',
+          instruction: 'कोर्स पूरा करने के बाद सरकारी प्रमाण पत्र प्राप्त कर स्वरोजगार शुरू करें।',
+          simplifiedInstruction: 'कोर्स पूरा होने पर सरकारी सर्टिफिकेट मिलेगा जिससे आप कमाई शुरू कर सकती हैं।',
+          example: 'उदाहरण: राष्ट्रीय स्तर पर मान्य सरकारी प्रमाण पत्र।',
+          actionType: 'external_handoff',
+          options: ['मार्गदर्शन स्पष्ट है'],
+          badge: 'कदम 4 / 4',
+        },
+      ],
+      en: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'Choose Your Preferred Vocational Trade',
+          instruction: 'Select between Tailoring, Basic Computer Literacy, Beautician, or Handicrafts.',
+          simplifiedInstruction: 'Choose what skill fits your goals — sewing, digital computers, or beauty wellness.',
+          example: 'Example: Tailoring allows flexible income directly from home.',
+          actionType: 'select',
+          options: ['Selected my preferred trade'],
+          badge: 'Step 1 of 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'Keep Aadhaar & School Marksheet Ready',
+          instruction: 'Gather applicant’s Aadhaar card copy, 8th/10th/12th marksheet, and 2 passport photos.',
+          simplifiedInstruction: 'Keep your Aadhaar card and school certificate safely in a folder.',
+          example: 'Example: Both original and photocopy are useful.',
+          actionType: 'select',
+          options: ['Documents ready'],
+          badge: 'Step 2 of 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'Enroll at Nearest Government Skill Center',
+          instruction: 'Visit the authorized TNSDC / PMKVY / ITI training center in your locality.',
+          simplifiedInstruction: 'Visit the training center in-person to register for the upcoming free batch.',
+          example: 'Example: Located near Government ITI or District Employment Office.',
+          actionType: 'confirm_details',
+          options: ['Ready to visit training center'],
+          badge: 'Step 3 of 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'Receive Certified Qualification & Self-Employment Support',
+          instruction: 'Complete the practical course, receive government certificate, and start self-employment.',
+          simplifiedInstruction: 'Graduate with an official government certificate to start earning respectfully.',
+          example: 'Example: NSQF-certified skill credential.',
+          actionType: 'external_handoff',
+          options: ['Understood clearly, ready to proceed'],
+          badge: 'Step 4 of 4',
+        },
+      ],
+    },
+  },
+
+  // 12. GOVERNMENT SCHEMES: Student Scholarships & Higher Education Support
+  {
+    id: 'scholarship-students',
+    category: 'scholarship',
+    taskType: 'government',
+    mode: 'guided',
+    title: {
+      ta: 'மாணவர்களுக்கான அரசு கல்வி உதவித்தொகை & புதுமைப் பெண் திட்டம்',
+      hi: 'छात्रों के लिए सरकारी छात्रवृत्ति व पुधुमै पेन योजना',
+      en: 'Government Scholarships for Students & Pudhumai Penn Scheme',
+      mr: 'विद्यार्थ्यांसाठी शासकीय शिष्यवृत्ती योजना (NSP & महाडीबीटी)',
+      te: 'విద్యార్థుల కోసం ప్రభుత్వ స్కాలర్‌షిప్ పథకాలు',
+      kn: 'ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸರ್ಕಾರದ ಉಚಿತ ವಿದ್ಯಾರ್ಥಿವೇತನ ಯೋಜನೆಗಳು',
+    },
+    department: {
+      ta: 'கல்வி அமைச்சகம் & சமூக நலத்துறை (National Scholarship Portal & Govt. of Tamil Nadu)',
+      hi: 'शिक्षा मंत्रालय एवं समाज कल्याण विभाग (NSP & राज्य सरकार)',
+      en: 'Ministry of Education & Social Welfare Dept (scholarships.gov.in)',
+      mr: 'शिक्षण मंत्रालय, भारत सरकार',
+      te: 'విద్యా మంత్రిత్వ శాఖ, భారత ప్రభుత్వం',
+      kn: 'ಶಿಕ್ಷಣ ಸಚಿವಾಲಯ, ಭಾರತ ಸರ್ಕಾರ',
+    },
+    whatItHelps: {
+      ta: 'பள்ளி மற்றும் கல்லூரி மாணவிகளுக்கு கல்வி உதவித்தொகை, கட்டணச் சலுகை மற்றும் கல்லூரி மாணவிகளுக்கு மாதம் ₹1,000 வங்கி வரவு வழங்குகிறது.',
+      hi: 'स्कूली व कॉलेज छात्राओं के लिए मासिक आर्थिक सहायता (₹1,000/माह), फीस माफी और केंद्रीय छात्रवृत्तियां सीधे बैंक खाते में।',
+      en: 'Direct bank support of ₹1,000 monthly for college girl students (Pudhumai Penn), post-matric tuition fee concessions, and Central/State merit scholarships via National Scholarship Portal (NSP).',
+    },
+    whoItIsFor: {
+      ta: 'பள்ளி, கல்லூரி மற்றும் பாலிடெக்னிக் படிக்கும் தகுதியான மாணவிகள் மற்றும் மாணவர்கள்.',
+      hi: 'स्कूल, कॉलेज और डिप्लोमा में नामांकित सभी पात्र छात्र-छात्राएं।',
+      en: 'Eligible students studying in recognized schools, colleges, polytechnics, and universities.',
+    },
+    eligibility: {
+      ta: [
+        'அரசுப் பள்ளியில் (6-12) படித்து கல்லூரி செல்லும் மாணவிகளுக்கு மாதம் ₹1,000 புதுமைப் பெண் உதவி.',
+        'அங்கீகரிக்கப்பட்ட பள்ளி அல்லது கல்லூரியில் தொடர்ந்து படித்து வர வேண்டும்.',
+        'மாணவர் பெயரில் ஆதார் இணைக்கப்பட்ட வங்கிக் கணக்கு இருக்க வேண்டும்.',
+      ],
+      hi: [
+        'सरकारी स्कूल से पढ़कर कॉलेज जाने वाली छात्राओं को ₹1,000 मासिक सहायता।',
+        'मान्यता प्राप्त स्कूल या कॉलेज में नियमित नामांकन।',
+        'विद्यार्थी के नाम पर आधार लिंक सक्रिय बैंक खाता।',
+      ],
+      en: [
+        'Girl students from government schools (classes 6-12) enrolled in undergraduate/diploma courses qualify for ₹1,000 monthly under Pudhumai Penn.',
+        'Enrolled in a recognized school, college, or university for pre/post-matric scholarships.',
+        'Active bank savings account in student’s own name with Aadhaar seeded.',
+      ],
+    },
+    documents: {
+      ta: [
+        'மாணவர் ஆதார் அட்டை (Student Aadhaar)',
+        'பள்ளி அல்லது கல்லூரி சேர்க்கை ரசீது (Bonafide / Admission Receipt)',
+        'மதிப்பெண் பட்டியல் (Marksheet with EMIS ID)',
+        'வங்கி கணக்கு புத்தக நகல் (Bank Passbook showing IFSC)',
+      ],
+      hi: [
+        'छात्र का आधार कार्ड',
+        'स्कूल / कॉलेज प्रवेश रसीद (बोनाफाइड)',
+        'पिछली कक्षा की मार्कशीट',
+        'बैंक खाता पासबुक की प्रति',
+      ],
+      en: [
+        'Student Aadhaar Card',
+        'Bonafide Certificate / College Admission Fee Receipt',
+        'Previous qualifying examination Marksheet',
+        'Bank Passbook copy showing Account Number & IFSC',
+      ],
+    },
+    officialSource: 'National Scholarship Portal (scholarships.gov.in)',
+    officialSourceName: 'National Scholarship Portal (scholarships.gov.in)',
+    officialUrl: 'https://scholarships.gov.in',
+    sourceType: 'official',
+    verified: true,
+    domainHierarchy: 'Ministry of Education & MeitY, Govt. of India (.gov.in)',
+    lastVerified: 'Active 2026',
+    primaryActionType: 'do_it_with_me',
+    primaryActionLabel: {
+      ta: 'உதவித்தொகைக்கு விண்ணப்பிக்க (Apply Scholarship)',
+      hi: 'छात्रवृत्ति के लिए आवेदन करें (Apply Scholarship)',
+      en: 'Apply for Student Scholarship',
+    },
+    steps: {
+      ta: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'தகுதியான கல்வி உதவித்தொகையை உறுதி செய்தல்',
+          instruction: 'மாணவி அரசுப் பள்ளியில் படித்தவரா அல்லது NSP தளம் மூலமான கட்டணச் சலுகையா என பாருங்கள்.',
+          simplifiedInstruction: 'உங்கள் மகள் அல்லது நீங்கள் படிக்கும் பள்ளி, கல்லூரியை வைத்து எந்த உதவித்தொகை கிடைக்கும் என்று உறுதி செய்வோம்.',
+          example: 'உதாரணம்: அரசுப் பள்ளி மாணவிகளுக்கு புதுமைப் பெண் மாதம் ₹1,000 உறுதி.',
+          actionType: 'select',
+          options: ['தகுதியை உறுதி செய்துவிட்டேன்'],
+          badge: 'படி 1 / 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'மாணவியின் சொந்த வங்கி கணக்கு புத்தகம்',
+          instruction: 'மாணவியின் சொந்த பெயரில் ஆதார் இணைக்கப்பட்ட வங்கிக் கணக்கு உள்ளதா என உறுதி செய்யுங்கள்.',
+          simplifiedInstruction: 'மாணவியின் சொந்த பெயரிலேயே பேங்க் பாஸ்புக் இருக்க வேண்டும். பெற்றோர் கணக்கு கூடாது.',
+          example: 'உதாரணம்: தேசியமயமாக்கப்பட்ட வங்கி அல்லது அஞ்சலக சேமிப்பு கணக்கு.',
+          actionType: 'select',
+          options: ['மாணவி பெயரில் வங்கி கணக்கு உள்ளது'],
+          badge: 'படி 2 / 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'கல்லூரி அல்லது தேசிய உதவித்தொகை தளத்தில் பதிவு',
+          instruction: 'கல்லூரி புதுமைப் பெண் ஒருங்கிணைப்பாளரிடம் ஆவணங்களை சமர்ப்பிக்கவும் அல்லது scholarships.gov.in தளத்தில் பதிவு செய்யவும்.',
+          simplifiedInstruction: 'கல்லூரி அலுவலகத்தில் புதுமைப் பெண் விண்ணப்பத்தை சமர்ப்பிக்கலாம்.',
+          example: 'உதாரணம்: கல்லூரியின் உதவித்தொகை பிரிவு கவுண்ட்டர்.',
+          actionType: 'confirm_details',
+          options: ['கல்லூரி பொறுப்பாளரை அணுகுவேன்'],
+          badge: 'படி 3 / 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'நேரடி வங்கி பண வரவு (DBT) உறுதி செய்தல்',
+          instruction: 'விண்ணப்பம் ஏற்கப்பட்டதும், ஒவ்வொரு மாதமும் உதவித்தொகை வங்கி கணக்கிற்கு நேரடியாக வந்து சேரும்.',
+          simplifiedInstruction: 'அரசு நேரடியாக வங்கி கணக்கில் பணத்தை செலுத்தும். போனுக்கு SMS வரும்.',
+          example: 'உதாரணம்: வங்கி கிரெடிட் SMS அறிவிப்பு.',
+          actionType: 'external_handoff',
+          options: ['அனைத்தையும் தெளிவாக புரிந்துகொண்டேன்'],
+          badge: 'படி 4 / 4',
+        },
+      ],
+      hi: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'पात्र छात्रवृत्ति योजना की पुष्टि',
+          instruction: 'जांचें कि आप पुधुमै पेन (₹1,000/माह) या राष्ट्रीय छात्रवृत्ति पोर्टल (NSP) के तहत पात्र हैं।',
+          simplifiedInstruction: 'सरकारी स्कूल से कॉलेज जाने वाली छात्राओं को मासिक ₹1,000 छात्रवृत्ति मिलती है।',
+          example: 'उदाहरण: सरकारी स्कूल की 12वीं की मार्कशीट या टीसी।',
+          actionType: 'select',
+          options: ['पात्रता समझ आ गई'],
+          badge: 'कदम 1 / 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'छात्रा का व्यक्तिगत बैंक खाता',
+          instruction: 'छात्रा के अपने नाम पर आधार लिंक बैंक खाता होना अनिवार्य है।',
+          simplifiedInstruction: 'खाता छात्रा के अपने नाम पर ही होना चाहिए, माता-पिता के नाम पर नहीं।',
+          example: 'उदाहरण: बैंक पासबुक की प्रथम प्रति।',
+          actionType: 'select',
+          options: ['बैंक खाता तैयार है'],
+          badge: 'कदम 2 / 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'कॉलेज या NSP पोर्टल पर आवेदन',
+          instruction: 'कॉलेज नोडल अधिकारी को कागजात दें या scholarships.gov.in पर पंजीकरण करें।',
+          simplifiedInstruction: 'कॉलेज कार्यालय जाकर योजना के प्रभारी शिक्षक को दस्तावेज जमा करें।',
+          example: 'उदाहरण: कॉलेज स्कॉलरशिप सेक्शन काउंटर।',
+          actionType: 'confirm_details',
+          options: ['कॉलेज से संपर्क करूँगी'],
+          badge: 'कदम 3 / 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'सीधे बैंक खाते में सहायता राशि',
+          instruction: 'सत्यापन के बाद हर महीने सहायता राशि सीधे बैंक खाते में जमा होगी।',
+          simplifiedInstruction: 'हर महीने सहायता राशि सीधे आपके बैंक खाते में आएगी।',
+          example: 'उदाहरण: बैंक क्रेडिट SMS।',
+          actionType: 'external_handoff',
+          options: ['मार्गदर्शन स्पष्ट है'],
+          badge: 'कदम 4 / 4',
+        },
+      ],
+      en: [
+        {
+          stepNumber: 1,
+          totalSteps: 4,
+          title: 'Identify Eligible Student Scholarship',
+          instruction: 'Verify if you qualify for Pudhumai Penn (₹1,000/month for college girls) or Central NSP tuition grants.',
+          simplifiedInstruction: 'Check your eligibility. Girl students from government schools qualify for ₹1,000 monthly.',
+          example: 'Example: 12th standard government school transfer certificate / EMIS ID.',
+          actionType: 'select',
+          options: ['Eligibility confirmed'],
+          badge: 'Step 1 of 4',
+        },
+        {
+          stepNumber: 2,
+          totalSteps: 4,
+          title: 'Student’s Own Aadhaar-Linked Bank Account',
+          instruction: 'Ensure the bank savings account belongs strictly to the student herself with Aadhaar seeded.',
+          simplifiedInstruction: 'The bank passbook must strictly be in the student’s own name, not parent’s.',
+          example: 'Example: Nationalized bank or Post Office payment bank passbook.',
+          actionType: 'select',
+          options: ['Bank account ready in student’s name'],
+          badge: 'Step 2 of 4',
+        },
+        {
+          stepNumber: 3,
+          totalSteps: 4,
+          title: 'Submit to College Nodal Officer or Apply on NSP',
+          instruction: 'Submit documents to your college scholarship officer or apply online at scholarships.gov.in.',
+          simplifiedInstruction: 'Visit the college scholarship administrative counter to register your application.',
+          example: 'Example: College administrative block scholarship desk.',
+          actionType: 'confirm_details',
+          options: ['Will approach college officer'],
+          badge: 'Step 3 of 4',
+        },
+        {
+          stepNumber: 4,
+          totalSteps: 4,
+          title: 'Direct Benefit Transfer (DBT) Monthly Credit',
+          instruction: 'Once approved, ₹1,000 is credited monthly directly to the student’s account until graduation.',
+          simplifiedInstruction: 'Every month, the scholarship will credit directly to the student’s account.',
+          example: 'Example: Bank SMS credit notification.',
+          actionType: 'external_handoff',
+          options: ['Understood clearly, ready to proceed'],
+          badge: 'Step 4 of 4',
+        },
+      ],
+    },
+  },
 ];
 
 // Open-ended Semantic Matcher for Instant Offline Resilience
@@ -1512,7 +2463,25 @@ export function matchUniversalResource(query: string): Resource | null {
     return UNIVERSAL_RESOURCES.find((r) => r.id === 'travel-kanchipuram-bus') || null;
   }
 
-  // 2. Chennai Central to Chennai Park Station
+  // 1. Train Ticket Online Booking (IRCTC, UTS, Indian Railways)
+  // Must check Train Ticket BEFORE cinema/generic booking
+  const isTrainRelated =
+    /train|railway|irctc|uts|rail|ரயில்|தொடர்வண்டி|ரயில்வே|ट्रेन|रेल|रेलवे|రైలు|ರೈಲು|ട്രെയിൻ|রেল|ਟਰੇਨ|ଟ୍ରେନ|ৰেল/.test(
+      lower
+    );
+  const isBookingAction =
+    /book|reserve|reservation|ticket|buy|booking|முன்பதிவு|டிக்கெட்|பதிவு|எடுக்க|வாங்க|புக்|बुक|आरक्षण|टिकट|టికెట్|ಬುಕ್|ടിക്കറ്റ്|বুক|ਟਿਕਟ|ଟିକେଟ|বুকিং/.test(
+      lower
+    );
+
+  if (isTrainRelated && isBookingAction) {
+    return UNIVERSAL_RESOURCES.find((r) => r.id === 'booking-train-ticket') || null;
+  }
+  if (isTrainRelated && /ticket|டிக்கெட்|टिकट|booking|முன்பதிவு/.test(lower)) {
+    return UNIVERSAL_RESOURCES.find((r) => r.id === 'booking-train-ticket') || null;
+  }
+
+  // 2. Chennai Central to Chennai Park Station (Pedestrian Walking Subway)
   if (
     /central.*park|park.*central|சென்ட்ர.*பார்க்|பார்க்.*சென்ட்ர|सेंट्रल.*पार्क|पार्क.*सेंट्रल|chennai central to chennai park/.test(
       lower
@@ -1522,13 +2491,17 @@ export function matchUniversalResource(query: string): Resource | null {
     return UNIVERSAL_RESOURCES.find((r) => r.id === 'navigation-central-to-park') || null;
   }
 
-  // 3. Cinema Ticket Online Booking
-  if (
-    /cinema|movie|theatre|ticket|film|திரைப்படம்|படம்|சினிமா|தியேட்டர்|டிக்கெட்|முன்பதிவு|सिनेमा|फिल्म|थिएटर|टिकट|बुक|సినిమా|టికెట్|ಸಿನೆಮಾ|ಟಿಕೆಟ್|bookmyshow/.test(
+
+  // 4. Cinema / Movie Ticket Online Booking (STRICTLY requires movie/cinema/theatre keywords!)
+  // The word "ticket" or "book" ALONE must NEVER match cinema!
+  const isCinemaRelated =
+    /cinema|movie|film|theatre|theater|திரைப்படம்|சினிமா|படம்|தியேட்டர்|सिनेमा|फिल्म|थिएटर|సినిమా|టాకీస్|ಸಿನೆಮಾ|bookmyshow|pvr|inox/.test(
       lower
-    ) &&
-    /ticket|book|முன்பதிவு|டிக்கெட்|बुक|சீட்|seat|online/.test(lower)
-  ) {
+    );
+  if (isCinemaRelated && (isBookingAction || /seat|சீட்|காட்சி|show|டிக்கெட்/.test(lower))) {
+    return UNIVERSAL_RESOURCES.find((r) => r.id === 'cinema-ticket-booking') || null;
+  }
+  if (isCinemaRelated && /ticket|டிக்கெட்|टिकट/.test(lower)) {
     return UNIVERSAL_RESOURCES.find((r) => r.id === 'cinema-ticket-booking') || null;
   }
 
@@ -1567,6 +2540,35 @@ export function matchUniversalResource(query: string): Resource | null {
   // 8. General: Photosynthesis
   if (/photosynthesis|ஒளிச்சேர்க்கை|प्रकाश संश्लेषण|కిరణజన్య సంయోగ క్రియ/.test(lower)) {
     return UNIVERSAL_RESOURCES.find((r) => r.id === 'general-photosynthesis') || null;
+  }
+
+  // 9. Government Certificates (e-Sevai, TNeGA, Income, Community, Nativity certificates)
+  const isCertificateQuery =
+    /certificate|certificates|சான்றிதழ்|சான்றிதழுக்கு|சான்றிதழ்கள்|प्रमाण पत्र|प्रमाणपत्र|வருமானச் சான்றிதழ்|ஜாதி சான்றிதழ்|இருப்பிடச் சான்றிதழ்|esevai|e-sevai|இ-சேவை|tnega|tnesevai|income certificate|community certificate|caste certificate|nativity certificate|first graduate certificate|birth certificate|death certificate/.test(
+      lower
+    );
+  if (isCertificateQuery) {
+    return UNIVERSAL_RESOURCES.find((r) => r.id === 'service-government-certificate') || null;
+  }
+
+  // 10. Free Skills & Learning (Vocational skills, tailoring, computer, beautician, handicrafts)
+  const isFreeSkillQuery =
+    /free skill|free skills|skills.*learn.*free|learn.*free|what skills can i learn|skills can i learn|free course|free training|vocational.*skill|skill training|skill development|இலவச.*திறன்|என்ன.*கற்கலாம்|தொழில் பயிற்சி|திறன் பயிற்சி|முफ्त.*कौशल|कौशल.*सीख|முफ्त कोर्स|फ्री स्किल/.test(
+      lower
+    ) ||
+    ((/skill|skills|திறன்|கற்க|कौशल|हुनर/.test(lower)) && (/free|இலவச|முफ्त|நன்மை|கட்டணமில்லா/.test(lower)));
+  if (isFreeSkillQuery) {
+    return UNIVERSAL_RESOURCES.find((r) => r.id === 'skills-learn-free') || null;
+  }
+
+  // 11. Student Scholarships (College/School, Pudhumai Penn, NSP)
+  const isScholarshipQuery =
+    /scholarship|scholarships|படிப்பு உதவித்தொகை|கல்வி உதவித்தொகை|மாணவர்களுக்கான|உதவித்தொகை|छात्रवृत्ति|शिष्यवृत्ती|స్కాలర్‌షిప్|ವಿದ್ಯಾರ್ಥಿವೇತನ|pudhumai penn|pudhumai|புதுமைப் பெண்|national scholarship|nsp portal|fee concession|fees waiver/.test(
+      lower
+    ) ||
+    ((/scholarship|छात्रवृत्ति|உதவித்தொகை/.test(lower)) && (/student|மாணவ|छात्र|college|school/.test(lower)));
+  if (isScholarshipQuery) {
+    return UNIVERSAL_RESOURCES.find((r) => r.id === 'scholarship-students') || null;
   }
 
   return null;

@@ -6,6 +6,7 @@ import {
   Keyboard,
   Volume2,
   Bus,
+  Train,
   Navigation,
   Film,
   UtensilsCrossed,
@@ -13,14 +14,20 @@ import {
   CreditCard,
   GraduationCap,
   Sparkles,
+  MapPin,
+  Landmark,
+  Target,
+  BookOpen,
 } from 'lucide-react';
 import { speakText } from '../../utils/speech';
+import { ESSENTIAL_SERVICES, EssentialServiceItem } from '../../data/essentialServices';
 
 interface HomeViewProps {
   currentLanguage: Language;
   onStartVoice: () => void;
   onStartText: () => void;
   onSelectCategory: (category: IntentCategory, promptText?: string) => void;
+  onStartEssentialService?: (service: EssentialServiceItem) => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -28,6 +35,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onStartVoice,
   onStartText,
   onSelectCategory,
+  onStartEssentialService,
 }) => {
   const greeting = getT(UI_TRANSLATIONS.welcomeGreeting, currentLanguage);
   const question = getT(UI_TRANSLATIONS.whatDoYouNeed, currentLanguage);
@@ -36,8 +44,43 @@ export const HomeView: React.FC<HomeViewProps> = ({
     speakText(`${greeting} ${question}`, currentLanguage);
   };
 
+  const getServiceIcon = (id: string) => {
+    switch (id) {
+      case 'services':
+        return Landmark;
+      case 'schemes':
+        return Target;
+      case 'skills':
+        return BookOpen;
+      default:
+        return Landmark;
+    }
+  };
+
   // Inspiring open-ended question pills
   const samplePrompts = [
+    {
+      icon: '🏥',
+      text: {
+        ta: 'எனக்கு அருகில் உள்ள மருத்துவமனைகள் எங்கே?',
+        hi: 'मेरे पास अस्पताल कहाँ है?',
+        en: 'Find hospitals near me',
+        mr: 'माझ्या जवळ रुग्णालय कुठे आहे?',
+        te: 'నాకు సమీపంలో ఆసుపత్రి ఎక్కడ ఉంది?',
+      },
+      category: 'location' as IntentCategory,
+    },
+    {
+      icon: '🎓',
+      text: {
+        ta: 'ஆவடி அருகில் உள்ள கல்லூரிகள் எவை?',
+        hi: 'आवाडी के पास कौन से कॉलेज हैं?',
+        en: 'Find colleges near Avadi',
+        mr: 'आवाडी जवळ कोणती महाविद्यालये आहेत?',
+        te: 'ఆవడి దగ్గర ఏ కాలేజీలు ఉన్నాయి?',
+      },
+      category: 'location' as IntentCategory,
+    },
     {
       icon: '🚌',
       text: {
@@ -59,6 +102,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
         te: 'చెన్నై సెంట్రల్ నుండి చెన్నై పార్క్ స్టేషన్‌కు ఎలా వెళ్ళాలి?',
       },
       category: 'navigation' as IntentCategory,
+    },
+    {
+      icon: '🚆',
+      text: {
+        ta: 'ரயில் டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?',
+        hi: 'ट्रेन टिकट ऑनलाइन कैसे बुक करें?',
+        en: 'How do I book a train ticket?',
+        mr: 'रेल्वे तिकीट ऑनलाइन कसे बुक करायचे?',
+        te: 'రైలు టికెట్ ఆన్‌లైన్‌లో ఎలా బుక్ చేయాలి?',
+      },
+      category: 'booking' as IntentCategory,
     },
     {
       icon: '🎬',
@@ -166,22 +220,44 @@ export const HomeView: React.FC<HomeViewProps> = ({
     {
       category: 'booking' as IntentCategory,
       title: {
-        ta: 'சினிமா & பயண டிக்கெட் முன்பதிவு',
-        hi: 'सिनेमा व टिकट बुकिंग',
-        en: 'Cinema & Ticket Booking',
+        ta: 'ரயில் டிக்கெட் முன்பதிவு',
+        hi: 'ट्रेन टिकट बुकिंग (IRCTC)',
+        en: 'Train Ticket Booking (IRCTC)',
+        mr: 'रेल्वे तिकीट बुकिंग',
+        te: 'రైలు టికెట్ బుకింగ్',
+      },
+      subtitle: {
+        ta: 'வரிசையில் நிற்காமல் ரயில் இருக்கை புக் செய்ய எளிய முறை',
+        hi: 'बिना लाइन लगे ट्रेन में सीट और स्लीपर/AC बुक करें',
+        en: 'Book train seats & Sleeper/AC without long station queues',
+        mr: 'रांगेत उभे न राहता रेल्वे तिकीट बुक करा',
+        te: 'క్యూలో నిలబడకుండా రైలు టికెట్ బుక్ చేసుకోండి',
+      },
+      prompt: 'ரயில் டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?',
+      icon: Train,
+      badge: 'IRCTC / Indian Railways',
+      colorClass: 'bg-indigo-50/90 border-indigo-200 text-indigo-950 hover:bg-indigo-100/80',
+      iconBg: 'bg-indigo-600 text-white',
+    },
+    {
+      category: 'booking' as IntentCategory,
+      title: {
+        ta: 'சினிமா டிக்கெட் முன்பதிவு',
+        hi: 'सिनेमा टिकट बुकिंग',
+        en: 'Cinema & Movie Tickets',
         mr: 'सिनेमा तिकीट बुकिंग',
         te: 'సినిమా టికెట్ బుకింగ్',
       },
       subtitle: {
         ta: 'படம் தேர்வு செய்து இருக்கை புக் செய்யும் எளிய முறை',
         hi: 'फिल्म व सीट चुनने का सीधा तरीका',
-        en: 'Pick movie, showtime, and seat safely',
+        en: 'Pick movie, theatre, showtime and seat safely',
         mr: 'चित्रपट व सीट बुक करा',
         te: 'సీటు ఎంచుకుని బుక్ చేయండి',
       },
       prompt: 'சினிமா டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?',
       icon: Film,
-      badge: 'BookMyShow / Apps',
+      badge: 'BookMyShow',
       colorClass: 'bg-amber-50/90 border-amber-200 text-amber-950 hover:bg-amber-100/80',
       iconBg: 'bg-amber-600 text-white',
     },
@@ -273,6 +349,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
       colorClass: 'bg-indigo-50/90 border-indigo-200 text-indigo-950 hover:bg-indigo-100/80',
       iconBg: 'bg-indigo-600 text-white',
     },
+    {
+      category: 'location' as IntentCategory,
+      title: {
+        ta: 'அருகிலுள்ள இடங்கள் & வரைபடம்',
+        hi: 'आसपास के स्थान व लाइव मैप्स',
+        en: 'Nearby Places & Live Maps',
+        mr: 'जवळची ठिकाणे व थेट नकाशे',
+        te: 'సమీప ప్రదేశాలు & లైవ్ మ్యాప్స్',
+      },
+      subtitle: {
+        ta: 'மருத்துவமனை, மருந்தகம், ஏடிஎம், கல்லூரி, பேருந்து நிறுத்தம்',
+        hi: 'अस्पताल, फार्मेसी, एटीएम, कॉलेज या बस स्टैंड खोजें',
+        en: 'Hospitals, pharmacies, colleges, ATMs or stations with distance',
+        mr: 'दवाखाने, औषधे, एटीएम किंवा कॉलेज थेट अंतरासह शोधा',
+        te: 'ఆసుపత్రులు, మందుల షాపులు, ఏటీఎమ్‌లు మరియు బస్ స్టాండ్లు',
+      },
+      prompt: 'Find hospitals near me',
+      icon: MapPin,
+      badge: 'Real Distance & Navigation',
+      colorClass: 'bg-emerald-50/90 border-emerald-200 text-emerald-950 hover:bg-emerald-100/80',
+      iconBg: 'bg-emerald-600 text-white',
+    },
   ];
 
   return (
@@ -344,6 +442,98 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </button>
       </div>
 
+      {/* ======================================================== */}
+      {/* ESSENTIAL SERVICES HIGHLIGHT (3 Core Pillars)           */}
+      {/* ======================================================== */}
+      <div className="mb-9">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3 px-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+            <h2 className="text-sm sm:text-base font-extrabold text-harshu-950 tracking-tight flex items-center gap-2">
+              <span>
+                {currentLanguage === 'ta'
+                  ? 'அத்தியாவசிய சேவைகள்'
+                  : currentLanguage === 'hi'
+                  ? 'आवश्यक सेवाएं'
+                  : currentLanguage === 'te'
+                  ? 'ముఖ్యమైన సేవలు'
+                  : currentLanguage === 'mr'
+                  ? 'महत्त्वाच्या सेवा'
+                  : 'Essential Services'}
+              </span>
+              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                Top Capabilities
+              </span>
+            </h2>
+          </div>
+          <span className="text-[11px] text-earth-600">
+            {currentLanguage === 'ta'
+              ? 'தொடங்க ஏதேனும் ஒரு அட்டையை தட்டவும்'
+              : currentLanguage === 'hi'
+              ? 'शुरू करने के लिए किसी भी कार्ड को दबाएं'
+              : 'Tap any card to speak or guide with HARSHU'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+          {ESSENTIAL_SERVICES.map((item) => {
+            const Icon = getServiceIcon(item.id);
+            const titleText = item.title[currentLanguage] || item.title.en;
+            const descText = item.description[currentLanguage] || item.description.en;
+            const badgeText = item.badge[currentLanguage] || item.badge.en;
+            const questionText = item.question[currentLanguage] || item.question.en;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  if (onStartEssentialService) {
+                    onStartEssentialService(item);
+                  } else {
+                    onSelectCategory('scholarship', questionText);
+                  }
+                }}
+                className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 transition-all flex flex-col justify-between ${item.accentClass} shadow-xs hover:shadow-md transform hover:-translate-y-1 active:scale-[0.98] group cursor-pointer`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xl sm:text-2xl">{item.iconEmoji}</span>
+                      <div
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center ${item.iconBg} shadow-xs group-hover:scale-105 transition-transform`}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/95 text-earth-800 border border-earth-200/90 shadow-2xs">
+                      {badgeText}
+                    </span>
+                  </div>
+
+                  <h3 className="font-extrabold text-sm sm:text-base text-harshu-950 mb-1 leading-snug group-hover:text-emerald-900 transition-colors">
+                    {titleText}
+                  </h3>
+
+                  <p className="text-xs text-earth-700 leading-relaxed mb-3">
+                    {descText}
+                  </p>
+                </div>
+
+                <div className="pt-2.5 border-t border-earth-200/70 flex items-center justify-between text-xs font-bold text-emerald-800 group-hover:text-emerald-950">
+                  <span className="line-clamp-1 italic text-[11px] opacity-90">
+                    "{questionText}"
+                  </span>
+                  <span className="ml-1 text-emerald-700 group-hover:translate-x-1 transition-transform">
+                    ➔
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Inspiring Question Pills (Real Questions Users Ask) */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3 px-1">
@@ -385,13 +575,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {domainCards.map((item) => {
+          {domainCards.map((item, idx) => {
             const Icon = item.icon;
             const titleText = getT(item.title, currentLanguage);
             const subText = getT(item.subtitle, currentLanguage);
             return (
               <button
-                key={item.category}
+                key={`${item.category}-${idx}`}
                 type="button"
                 onClick={() => onSelectCategory(item.category, item.prompt)}
                 className={`w-full text-left p-4 sm:p-4.5 rounded-2xl border transition-all flex items-start gap-3.5 ${item.colorClass} shadow-xs hover:shadow-md transform hover:-translate-y-0.5 active:scale-[0.99]`}

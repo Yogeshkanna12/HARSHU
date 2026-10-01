@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({
           title="Product Architecture & Innovation Overview"
         >
           <Award className="w-3.5 h-3.5 text-amber-700" />
-          <span className="hidden sm:inline">Hackathon Story</span>
+          <span className="hidden sm:inline">Description</span>
         </button>
 
         {/* Multilingual Selector Dropdown */}

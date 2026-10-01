@@ -7,6 +7,7 @@ import {
   buildResourceFromEntry,
 } from './resourceDiscovery';
 import { UNIVERSAL_RESOURCES, matchUniversalResource } from './universalKnowledge';
+import { detectLocationIntent } from './locationService';
 
 export async function detectIntentAsync(
   rawText: string,
@@ -29,14 +30,59 @@ export async function detectIntentAsync(
 export function detectIntent(rawText: string, preferredLang: Language): IntentResult {
   const detected = detectLanguageFromText(rawText, preferredLang);
 
+  // Check Universal Location intent
+  const locIntent = detectLocationIntent(rawText);
+  if (locIntent.isLocationQuery) {
+    const targetLang = preferredLang || detected || 'en';
+    const catName = locIntent.localizedCategory[targetLang] || locIntent.localizedCategory[detected] || locIntent.categoryLabel;
+    const meaning =
+      targetLang === 'ta'
+        ? `${locIntent.targetArea ? `${locIntent.targetArea} பகுதியில்` : 'அருகில் உள்ள'} ${catName} அறிய விரும்புகிறீர்கள்`
+        : targetLang === 'hi'
+        ? `${locIntent.targetArea ? `${locIntent.targetArea} में` : 'आपके पास'} ${catName} खोजना चाहती हैं`
+        : `Looking for ${catName} ${locIntent.targetArea ? `in ${locIntent.targetArea}` : 'near you'}`;
+    const directAns =
+      targetLang === 'ta'
+        ? `உங்களுக்கு அருகில் உள்ள ${catName} கண்டறிய வழிகாட்டுகிறேன்.`
+        : targetLang === 'hi'
+        ? `मैं आपके पास स्थित ${catName} ढूंढने में मदद करूंगी।`
+        : `I will find ${catName} ${locIntent.targetArea ? `in ${locIntent.targetArea}` : 'near you'}.`;
+
+    return {
+      category: 'location',
+      taskType: 'location',
+      mode: 'direct_answer',
+      rawInput: rawText,
+      recognizedText: rawText,
+      detectedLanguage: detected,
+      detectedLanguageName: detected,
+      interpretedMeaning: meaning,
+      directAnswer: directAns,
+      summaryByLanguage: {
+        [targetLang]: meaning,
+        en: meaning,
+      },
+      schemeId: `location-${locIntent.category || 'places'}`,
+      isAiGenerated: false,
+    };
+  }
+
   const univMatch = matchUniversalResource(rawText);
   if (univMatch) {
-    const meaning = univMatch.whatItHelps[detected] || univMatch.whatItHelps[preferredLang] || univMatch.whatItHelps.en;
-    const answer =
-      (univMatch.simpleExplanation && (univMatch.simpleExplanation[detected] || univMatch.simpleExplanation[preferredLang] || univMatch.simpleExplanation.en)) ||
+    const targetLang = preferredLang || detected || 'en';
+    const meaning =
+      univMatch.whatItHelps[targetLang] ||
       univMatch.whatItHelps[detected] ||
-      univMatch.whatItHelps[preferredLang] ||
-      univMatch.whatItHelps.en;
+      univMatch.whatItHelps.en ||
+      univMatch.whatItHelps.ta ||
+      '';
+    const answer =
+      (univMatch.simpleExplanation &&
+        (univMatch.simpleExplanation[targetLang] ||
+          univMatch.simpleExplanation[detected] ||
+          univMatch.simpleExplanation.en ||
+          univMatch.simpleExplanation.ta)) ||
+      meaning;
     return {
       category: univMatch.category,
       taskType: univMatch.taskType,
@@ -64,6 +110,17 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
   // Call understandUserNeed internally (synchronous fallback logic)
   const lower = rawText.toLowerCase().trim();
 
+  const isCertificate =
+    /certificate|certificates|சான்றிதழ்|சான்றிதழுக்கு|சான்றிதழ்கள்|प्रमाण पत्र|प्रमाणपत्र|வருமானச் சான்றிதழ்|ஜாதி சான்றிதழ்|இருப்பிடச் சான்றிதழ்|esevai|e-sevai|இ-சேவை|tnega|tnesevai|income certificate|community certificate|caste certificate|nativity certificate|first graduate|birth certificate|death certificate/.test(
+      lower
+    );
+
+  const isFreeSkills =
+    /free skill|free skills|skills.*learn.*free|learn.*free|what skills can i learn|skills can i learn|free course|free training|vocational.*skill|skill training|skill development|இலவச.*திறன்|என்ன.*கற்கலாம்|தொழில் பயிற்சி|திறன் பயிற்சி|मुफ्त.*कौशल|कौशल.*सीख|मुफ्त कोर्स|फ्री स्किल/.test(
+      lower
+    ) ||
+    ((/skill|skills|திறன்|கற்க|कौशल|हुनर/.test(lower)) && (/free|இலவச|मुफ्त|நன்மை|கட்டணமில்லா/.test(lower)));
+
   const isScholarship =
     /scholarship|படிப்பு|கல்லூரி|பள்ளி|மாணவி|கல்வி|மாணவர்|மாணவர்களுக்கான|உதவித்தொகை|छात्रवृत्ति|शिक्षा|कॉलेज|स्कूल|विद्यार्थी|शिष्यवृत्ती|શિક્ષણ|શિષ્યવૃત્તિ|స్కాలర్‌షిప్|చదువు|ವಿದ್ಯಾರ್ಥಿವೇತನ|ವಿದ್ಯಾರ್ಥಿ|സ്കോളർഷിപ്പ്|പഠനം|বৃত্তি|শিক্ষার্থী|ਵਜੀਫਾ|ବୃତ୍ତି|وظیفہ|تعلیم|school|college|study|student|fees|tuition/.test(
       lower
@@ -83,12 +140,18 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
       lower
     );
 
-  let schemeId = 'pudhumai-penn-scholarship';
+  let schemeId = 'scholarship-students';
   let category: any = 'scholarship';
 
-  if (isScholarship) {
+  if (isCertificate) {
+    category = 'welfare';
+    schemeId = 'service-government-certificate';
+  } else if (isFreeSkills) {
+    category = 'skills';
+    schemeId = 'skills-learn-free';
+  } else if (isScholarship) {
     category = 'scholarship';
-    schemeId = 'pudhumai-penn-scholarship';
+    schemeId = 'scholarship-students';
   } else if (isTailoring) {
     category = 'skills';
     schemeId = 'free-sewing-machine';
@@ -101,6 +164,30 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
   }
 
   const directAnswers: Record<string, Record<string, string>> = {
+    'service-government-certificate': {
+      ta: 'ஆம், அரசு சான்றிதழ்களை (வருமானம், சாதி, இருப்பிடம் போன்றவை) அரசு இ-சேவை (e-Sevai / TNeGA) தளம் மூலமாகவோ அல்லது அருகிலுள்ள இ-சேவை மையம் மூலமாகவோ மிக எளிதாகப் பெறலாம். தேவையான ஆவணங்கள் மற்றும் விண்ணப்பிக்கும் முறையை HARSHU உங்களுக்கு ஒரு படியாக வழிகாட்டும்.',
+      hi: 'हाँ, आप सरकारी प्रमाणपत्र (आय प्रमाण पत्र, जाति प्रमाण पत्र, मूल निवास आदि) ई-सेवा (e-Sevai / TNeGA) पोर्टल अथवा नजदीकी ई-सेवा केंद्र से आसानी से प्राप्त कर सकती हैं। HARSHU आपको आवश्यक दस्तावेज और ऑनलाइन आवेदन का पूरा तरीका समझाएगा।',
+      en: 'Yes! You can apply for essential government certificates (Income, Community, Nativity, and First Graduate certificates) online via the official e-Sevai / TNeGA portal or at your nearest e-Sevai service center. HARSHU will guide you through the 3 simple steps and required documents.',
+      mr: 'होय, तुम्ही अधिकृत ई-सेवा पोर्टल किंवा सेतू केंद्रावरून आवश्यक सरकारी दाखले (उत्पन्न, जात, रहिवासी) सहज मिळवू शकता. HARSHU तुम्हाला कागदपत्रे आणि अर्ज करण्याची पायरी समजावून सांगेल.',
+      te: 'అవును, మీరు అవసరమైన ప్రభుత్వ ధృవీకరణ పత్రాలను (ఆదాయం, కుల, నివాస ధృవీకరణ పత్రాలు) మీ-సేవ లేదా ఇ-సేవ పోర్టల్ ద్వారా పొందవచ్చు.',
+      kn: 'ಹೌದು, ನೀವು ಅಗತ್ಯ ಸರ್ಕಾರಿ ಪ್ರಮಾಣಪತ್ರಗಳನ್ನು (ಆದಾಯ, ಜಾತಿ, ವಾಸಸ್ಥಳ) ಇ-ಸೇವಾ ಪೋರ್ಟಲ್ ಅಥವಾ ಕೇಂದ್ರಗಳ ಮೂಲಕ ಸುಲಭವಾಗಿ ಪಡೆಯಬಹುದು.',
+    },
+    'skills-learn-free': {
+      ta: 'ஆம், தமிழ்நாடு திறன் மேம்பாட்டுக் கழகம் (TNSDC) மற்றும் பிரதம மந்திரி கௌஷல் விகாஸ் யோஜனா (PMKVY) மூலமாக முற்றிலும் இலவசமாக தையல், கணினிப் பயிற்சி, அழகுக்கலை, மற்றும் கைவினைப் பயிற்சிகளை அரசு சான்றிதழுடன் இலவசமாகக் கற்கலாம். HARSHU இதில் சேரும் முறையை உங்களுக்கு வழிகாட்டும்.',
+      hi: 'हाँ, कौशल विकास मिशन (TNSDC & PMKVY) के माध्यम से महिलाएं सिलाई, कंप्यूटर, ब्यूटीशियन, हस्तशिल्प और फूड प्रोसेसिंग का प्रशिक्षण सरकारी प्रमाण पत्र के साथ पूरी तरह निःशुल्क सीख सकती हैं। HARSHU आपको नजदीकी केंद्र और पंजीकरण की पूरी जानकारी देगा।',
+      en: 'Yes! You can learn valuable vocational skills completely free of cost through government skill missions (TNSDC & PMKVY) — including tailoring, computer literacy, beautician courses, and handicrafts with official government certification. HARSHU will guide you to the official registration.',
+      mr: 'होय! शासनमान्य कौशल्य विकास अभियानांतर्गत (PMKVY) महिलांसाठी मोफत शिलाई, संगणक, ब्युटीशियन आणि हस्तकला प्रशिक्षण मोफत उपलब्ध आहे.',
+      te: 'అవును! మహిళల కోసం ప్రభుత్వం పూర్తిగా ఉచితంగా టైలరింగ్, కంప్యూటర్ కోర్సులు, బ్యూటీషియన్ మరియు హస్తకళల నైపుణ్య శిక్షణను అందిస్తోంది.',
+      kn: 'ಹೌದು! ಕೌಶಲ್ಯ ಅಭಿವೃದ್ಧಿ ಯೋಜನೆಯಡಿ ಮಹಿಳೆಯರಿಗೆ ಉಚಿತ ಹೊಲಿಗೆ, ಕಂಪ್ಯೂಟರ್ ಮತ್ತು ಬ್ಯೂಟಿಷಿಯನ್ ಕೋರ್ಸ್‌ಗಳನ್ನು ಉಚಿತವಾಗಿ ಕಲಿಯಬಹುದು.',
+    },
+    'scholarship-students': {
+      ta: 'ஆம், பள்ளி மற்றும் கல்லூரி மாணவர்களுக்காகப் பல்வேறு இலவச அரசு கல்வி உதவித்தொகைகள் வழங்கப்படுகின்றன. குறிப்பாக மாணவிகளுக்கு மாதம் ₹1,000 வழங்கும் புதுமைப் பெண் திட்டம் மற்றும் தேசிய கல்வி உதவித்தொகை தளம் (NSP) மூலமாக பயிற்சிக் கட்டண சலுகைகள் உள்ளன. தகுதியை சரிபார்த்து விண்ணப்பிக்க HARSHU வழிகாட்டும்.',
+      hi: 'हाँ, स्कूल और कॉलेज छात्रों के लिए सरकार की ओर से महत्वपूर्ण छात्रवृत्तियां उपलब्ध हैं। विशेषकर छात्राओं के लिए प्रतिमाह ₹1,000 की वित्तीय सहायता (पुधुमै पेन योजना) तथा राष्ट्रीय छात्रवृत्ति पोर्टल (NSP) के तहत पूरी सहायता दी जाती है। HARSHU आपको आवेदन की पूरी विधि बताएगा।',
+      en: 'Yes, absolutely! The government provides several scholarship programs for students, including ₹1,000 monthly support for college girls under Pudhumai Penn, and pre/post-matric scholarships via the National Scholarship Portal (NSP). HARSHU will guide you step by step to verify eligibility and apply.',
+      mr: 'होय, नक्कीच! शासनामार्फत शालेय आणि महाविद्यालयीन विद्यार्थ्यांसाठी विविध शिष्यवृत्ती योजना उपलब्ध आहेत.',
+      te: 'అవును, ఖచ్చితంగా! ప్రభుత్వం విద్యార్థుల కోసం అనేక స్కాలర్‌షిప్ పథకాలను అందిస్తోంది.',
+      kn: 'ಹೌದು, ಖಂಡಿತವಾಗಿಯೂ! ಶಾಲಾ ಮತ್ತು ಕಾಲೇಜು ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸರ್ಕಾರದಿಂದ ಅನೇಕ ವಿದ್ಯಾರ್ಥಿವೇತನಗಳು ಲಭ್ಯವಿವೆ.',
+    },
     'pudhumai-penn-scholarship': {
       ta: 'ஆம், நிச்சயமாக! அரசாங்கத்தின் சார்பில் பள்ளி மற்றும் கல்லூரி மாணவர்களுக்காக பல்வேறு இலவச கல்வி உதவித்தொகைகள் வழங்கப்படுகின்றன. குறிப்பாக மாணவிகளுக்கு மாதம் ₹1,000 வழங்கும் "புதுமைப் பெண் திட்டம்", போஸ்ட்-மெட்ரிக் கல்வி உதவித்தொகை மற்றும் தேசிய உதவித்தொகை தளம் (NSP) மூலமாக கட்டணச் சலுகைகள் உள்ளன. இதில் நீங்கள் பயன்பெற தேவையான தகுதிகள் மற்றும் விண்ணப்பிக்கும் முறையை HARSHU உங்களுக்கு ஒரு படியாக வழிகாட்டும்.',
       hi: 'हाँ, बिल्कुल! सरकार की ओर से स्कूली और कॉलेज छात्राओं के लिए कई महत्वपूर्ण छात्रवृत्तियां उपलब्ध हैं। विशेषकर कॉलेज जाने वाली छात्राओं को प्रतिमाह ₹1,000 की वित्तीय सहायता (पुधुमै पेन योजना) तथा राष्ट्रीय छात्रवृत्ति पोर्टल (NSP) के तहत पूरी फीस माफी व सहायता दी जाती है। HARSHU आपको इसके लिए आवेदन करने का सीधा तरीका बताएगा।',
@@ -113,7 +200,7 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
       ta: 'ஆம், சமூக நலத்துறை மற்றும் திறன் மேம்பாட்டுக் கழகம் (TNSDC) சார்பாக பெண்களுக்கு முற்றிலும் இலவச தையல் பயிற்சி மற்றும் சத்யவாணி முத்து அம்மையார் நினைவு திட்டத்தின் கீழ் இலவச தையல் இயந்திரம் வழங்கப்படுகிறது. 20 முதல் 45 வயதுக்குட்பட்ட பெண்கள் விண்ணப்பித்து வீட்டில் இருந்தே வருமானம் ஈட்டலாம். இதற்கு தேவையான ஆவணங்கள் மற்றும் விண்ணப்பிக்கும் முறையை நாம் சேர்ந்து செய்வோம்.',
       hi: 'हाँ, सरकार द्वारा महिलाओं को घर बैठे आत्मनिर्भर बनाने के लिए मुफ्त सिलाई प्रशिक्षण और मुफ्त सिलाई मशीन योजना चलाई जा रही है। 20 से 45 वर्ष की महिलाएं इसके लिए पात्र हैं। HARSHU आपको बताएगा कि इसके लिए कौन से 3 दस्तावेज चाहिए और आवेदन कैसे करना है।',
       en: 'Yes! The Directorate of Social Welfare and Skill Development Mission provide free tailoring certification courses along with a free sewing machine for eligible women aged 20 to 45. This enables you to earn a respectable income directly from home. HARSHU will walk you through the documents and application process.',
-      mr: 'होय! महिला व बालविकास विभाग आणि कौशल्य विकास अभियानांतर्गत मोफत शिलाई प्रशिक्षण आणि गरजू महिलांना मोफत शिलाई मशीन दिली जाते. २० ते ४৫ वयोगटातील महिला यासाठी पात्र आहेत. HARSHU तुम्हाला कागदपत्रे आणि अर्ज कसा करायचा हे समजावून सांगेल.',
+      mr: 'होय! महिला व बालविकास विभाग आणि कौशल्य विकास अभियानांतर्गत मोफत शिलाई प्रशिक्षण आणि गरजू महिलांना मोफत शिलाई मशीन दिली जाते. २० ते ४५ वयोगटातील महिला यासाठी पात्र आहेत. HARSHU तुम्हाला कागदपत्रे आणि अर्ज कसा करायचा हे समजावून सांगेल.',
       te: 'అవును! మహిళలు స్వయం ఉపాధి పొందడానికి ప్రభుత్వం ఉచిత కుట్టు శిక్షణ మరియు ఉచిత కుట్టు మిషన్ పథకాన్ని అందిస్తోంది. 20 నుండి 45 సంవత్సరాల మహిళలు అర్హులు.',
       kn: 'ಹೌದು! ಮಹಿಳೆಯರು ಸ್ವಾವಲಂಬಿಗಳಾಗಲು ಸರ್ಕಾರವು ಉಚಿತ ಹೊಲಿಗೆ ತರಬೇತಿ ಮತ್ತು ಹೊಲಿಗೆ ಯಂತ್ರ ನೀಡುವ ಯೋಜನೆಗಳನ್ನು ಜಾರಿಗೆ ತಂದಿದೆ. ೨೦ ರಿಂದ ೪೫ ವರ್ಷದ ಮಹಿಳೆಯರು ಅರ್ಹರು.',
     },
@@ -136,6 +223,30 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
   };
 
   const meanings: Record<string, Record<string, string>> = {
+    'service-government-certificate': {
+      ta: 'அரசு இ-சேவை மூலம் சான்றிதழ்களுக்கு விண்ணப்பிக்கும் முறையை அறிய விரும்புகிறீர்கள்.',
+      hi: 'आप ई-सेवा पोर्टल के माध्यम से सरकारी प्रमाणपत्र प्राप्त करने की प्रक्रिया जानना चाहती हैं।',
+      en: 'You want to know how to apply for government certificates via official e-Sevai.',
+      mr: 'शासकीय दाखले मिळविण्याच्या प्रक्रियेबद्दल जाणून घ्यायचे आहे.',
+      te: 'ప్రభుత్వ ధృవీకరణ పత్రాల కోసం దరఖాస్తు విధానం తెలుసుకోవాలనుకుంటున్నారు.',
+      kn: 'ಸರ್ಕಾರಿ ಪ್ರಮಾಣಪತ್ರಗಳಿಗೆ ಅರ್ಜಿ ಸಲ್ಲಿಸುವ ವಿಧಾನವನ್ನು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
+    },
+    'skills-learn-free': {
+      ta: 'பெண்களுக்கான இலவச தொழிற்கல்வி மற்றும் திறன் மேம்பாட்டுப் பயிற்சிகளை அறிய விரும்புகிறீர்கள்.',
+      hi: 'आप महिलाओं के लिए मुफ्त वोकेशनल स्किल ट्रेनिंग और कौशल विकास के बारे में जानना चाहती हैं।',
+      en: 'You want to know what vocational skills and courses you can learn for free.',
+      mr: 'महिलांसाठी मोफत व्यावसायिक कौशल्यांबद्दल माहिती हवी आहे.',
+      te: 'మహిళల కోసం ఉచిత నైపుణ్య శిక్షణ గురించి తెలుసుకోవాలనుకుంటున్నారు.',
+      kn: 'ಮಹಿಳೆಯರಿಗಾಗಿ ಉಚಿತ ಕೌಶಲ್ಯ ತರಬೇತಿಯ ಬಗ್ಗೆ ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
+    },
+    'scholarship-students': {
+      ta: 'மாணவர்களுக்கான அரசு கல்வி உதவித்தொகை பற்றி அறிய விரும்புகிறீர்கள்.',
+      hi: 'आप छात्रों के लिए सरकारी छात्रवृत्ति योजनाओं के बारे में जानना चाहती हैं।',
+      en: 'You want to know about government scholarships available for students.',
+      mr: 'विद्यार्थ्यांसाठी सरकारी शिष्यवृत्ती योजनांबद्दल जाणून घ्यायचे आहे.',
+      te: 'విద్యార్థుల కోసం ప్రభుత్వ స్కాలర్‌షిప్‌ల గురించి తెలుసుకోవాలనుకుంటున్నారు.',
+      kn: 'ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸರ್ಕಾರಿ ವಿದ್ಯಾರ್ಥಿವೇತನದ ಬಗ್ಗೆ ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
+    },
     'pudhumai-penn-scholarship': {
       ta: 'மாணவர்களுக்கான இலவச அரசு கல்வி உதவித்தொகை உள்ளதா என அறிய விரும்புகிறீர்கள்.',
       hi: 'आप जानना चाहती हैं कि क्या छात्रों के लिए सरकारी छात्रवृत्ति उपलब्ध है।',
@@ -148,7 +259,7 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
       ta: 'தையல் பயிற்சி மற்றும் இலவச தையல் இயந்திர உதவி பற்றி அறிய விரும்புகிறீர்கள்.',
       hi: 'आप सिलाई सीखने और मुफ्त सिलाई मशीन सहायता के बारे में जानना चाहती हैं।',
       en: 'You want to know about free tailoring skill training and sewing machine support.',
-      mr: 'शिवਣकाम शिकणे आणि मोफत शिलाई मशीन योजनेबद्दल जाणून घ्यायचे आहे.',
+      mr: 'शिवणकाम शिकणे आणि मोफत शिलाई मशीन योजनेबद्दल जाणून घ्यायचे आहे.',
       te: 'కుట్టు పని నేర్చుకోవడం మరియు ఉచిత కుట్టు మిషన్ సహాయం గురించి తెలుసుకోవాలనుకుంటున్నారు.',
       kn: 'ಹೊಲಿಗೆ ತರಬೇತಿ ಮತ್ತು ಉಚಿತ ಹೊಲಿಗೆ ಯಂತ್ರದ ಸಹಾಯದ ಬಗ್ಗೆ ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ.',
     },
@@ -170,13 +281,14 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
     },
   };
 
-  const schemeAnswers = directAnswers[schemeId] || directAnswers['pudhumai-penn-scholarship'];
-  const schemeMeanings = meanings[schemeId] || meanings['pudhumai-penn-scholarship'];
+  const schemeAnswers = directAnswers[schemeId] || directAnswers['scholarship-students'] || directAnswers['pudhumai-penn-scholarship'];
+  const schemeMeanings = meanings[schemeId] || meanings['scholarship-students'] || meanings['pudhumai-penn-scholarship'];
 
+  const targetLang = preferredLang || detected || 'en';
   const answer =
-    schemeAnswers[detected] || schemeAnswers[preferredLang] || schemeAnswers.en;
+    schemeAnswers[targetLang] || schemeAnswers[detected] || schemeAnswers.en || schemeAnswers.ta;
   const meaning =
-    schemeMeanings[detected] || schemeMeanings[preferredLang] || schemeMeanings.en;
+    schemeMeanings[targetLang] || schemeMeanings[detected] || schemeMeanings.en || schemeMeanings.ta;
 
   return {
     category,

@@ -26,8 +26,13 @@ import {
   Smartphone,
   CreditCard,
   Mic,
+  Phone,
+  Globe,
+  Compass,
+  AlertCircle,
 } from 'lucide-react';
 import { speakText } from '../../utils/speech';
+import { requestBrowserLocation, saveUserCoords } from '../../utils/locationService';
 
 interface ResourceCardProps {
   currentLanguage: Language;
@@ -54,15 +59,15 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
 
   const eligibility =
     resource.eligibility[currentLanguage] ||
-    resource.eligibility['ta'] ||
     resource.eligibility['en'] ||
+    resource.eligibility['ta'] ||
     Object.values(resource.eligibility)[0] ||
     [];
 
   const documents =
     resource.documents[currentLanguage] ||
-    resource.documents['ta'] ||
     resource.documents['en'] ||
+    resource.documents['ta'] ||
     Object.values(resource.documents)[0] ||
     [];
 
@@ -410,6 +415,274 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
           </div>
         )}
 
+        {/* UNIVERSAL LOCATION DOMAIN: Nearby Real Places, Distances & Navigation */}
+        {resource.locationData && (
+          <div className="my-5 space-y-4">
+            {/* If Permission is needed */}
+            {resource.locationData.status === 'needs_location_permission' && (
+              <div className="p-5 sm:p-6 bg-amber-50/90 border-2 border-amber-300 rounded-3xl shadow-sm text-center">
+                <div className="w-12 h-12 mx-auto mb-3 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center">
+                  <Compass className="w-6 h-6 animate-pulse" />
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-amber-950 mb-2">
+                  {currentLanguage === 'ta'
+                    ? 'இருப்பிட அனுமதி தேவை (Location Permission)'
+                    : currentLanguage === 'hi'
+                    ? 'लोकेशन की अनुमति चाहिए'
+                    : 'Location Permission Needed'}
+                </h3>
+                <p className="text-xs sm:text-sm text-amber-900 mb-5 leading-relaxed max-w-md mx-auto">
+                  {currentLanguage === 'ta'
+                    ? 'உங்களுக்கு மிக அருகிலுள்ள இடங்களை சரியாகக் கண்டறிய உங்கள் இருப்பிடத்தை பகிரவும் அல்லது உங்கள் ஊரின் பெயரை உள்ளிடவும்.'
+                    : currentLanguage === 'hi'
+                    ? 'आपके सबसे नजदीकी स्थानों को खोजने के लिए कृपया अपनी लोकेशन शेयर करें या अपने क्षेत्र का नाम दर्ज करें।'
+                    : 'I need your location to find places near you. You can allow location access or tell me your area.'}
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center max-w-md mx-auto">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const coords = await requestBrowserLocation();
+                        saveUserCoords(coords);
+                        if (onFollowUp) {
+                          onFollowUp(`Find ${resource.locationData?.queryCategory || 'places'} near me`);
+                        }
+                      } catch {
+                        alert(
+                          currentLanguage === 'ta'
+                            ? 'இருப்பிட அனுமதி கிடைக்கவில்லை. தயவுசெய்து உங்கள் ஊரின் பெயரை தட்டச்சு செய்யவும்.'
+                            : 'Could not access location. Please type your area name below.'
+                        );
+                      }
+                    }}
+                    className="w-full sm:w-auto px-5 py-3 bg-harshu-800 hover:bg-harshu-900 text-white text-sm font-bold rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all active:scale-98"
+                  >
+                    <MapPin className="w-4 h-4 text-harshu-300" />
+                    <span>
+                      {currentLanguage === 'ta'
+                        ? 'இருப்பிட அனுமதி வழங்க 📍'
+                        : currentLanguage === 'hi'
+                        ? 'लोकेशन की अनुमति दें 📍'
+                        : 'Allow Location Access 📍'}
+                    </span>
+                  </button>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-amber-200/80 max-w-md mx-auto">
+                  <span className="text-xs font-semibold text-amber-900 block mb-2">
+                    {currentLanguage === 'ta'
+                      ? 'அல்லது உங்கள் ஊர்/பகுதி பெயரை தட்டச்சு செய்யவும்:'
+                      : currentLanguage === 'hi'
+                      ? 'या अपने शहर / क्षेत्र का नाम लिखें:'
+                      : 'Or enter your area/city name:'}
+                  </span>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder={currentLanguage === 'ta' ? 'எ.கா: Avadi, Tambaram' : 'e.g. Avadi, Tambaram'}
+                      id="manual-area-input"
+                      className="flex-1 px-3.5 py-2.5 bg-white border border-amber-300 rounded-xl text-xs sm:text-sm text-earth-900 focus:outline-none focus:ring-2 focus:ring-harshu-600"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const val = (e.target as HTMLInputElement).value.trim();
+                          if (val && onFollowUp) {
+                            onFollowUp(`Find ${resource.locationData?.queryCategory || 'places'} in ${val}`);
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const input = document.getElementById('manual-area-input') as HTMLInputElement;
+                        const val = input?.value.trim();
+                        if (val && onFollowUp) {
+                          onFollowUp(`Find ${resource.locationData?.queryCategory || 'places'} in ${val}`);
+                        }
+                      }}
+                      className="px-4 py-2.5 bg-amber-800 hover:bg-amber-900 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs"
+                    >
+                      {currentLanguage === 'ta' ? 'தேடு' : 'Search'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* If Results are available */}
+            {resource.locationData.status === 'ready' && resource.locationData.places.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-xs sm:text-sm font-bold text-earth-900 flex items-center gap-1.5 uppercase tracking-wide">
+                    <MapPin className="w-4 h-4 text-emerald-700" />
+                    <span>
+                      {currentLanguage === 'ta'
+                        ? `கிடைத்த இடங்கள் (${resource.locationData.places.length}):`
+                        : `Verified Places Nearby (${resource.locationData.places.length}):`}
+                    </span>
+                  </h3>
+                  <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                    {currentLanguage === 'ta' ? 'உண்மையான இடங்கள்' : 'Real Places'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {resource.locationData.places.map((place, idx) => {
+                    const isSelected =
+                      place.id === resource.locationData?.selectedPlace?.id ||
+                      (idx === 0 && !resource.locationData?.selectedPlace);
+
+                    return (
+                      <div
+                        key={place.id || idx}
+                        className={`p-4 sm:p-5 rounded-2xl border-2 transition-all shadow-xs ${
+                          isSelected
+                            ? 'bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/80 border-emerald-400 ring-2 ring-emerald-200'
+                            : 'bg-white border-earth-200/90 hover:border-emerald-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                              <h4 className="font-bold text-sm sm:text-base text-earth-950 leading-snug">
+                                {place.name}
+                              </h4>
+                              {idx === 0 && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 border border-amber-300 text-amber-950 rounded-full text-[10px] font-bold">
+                                  🌟 {currentLanguage === 'ta' ? 'மிக அருகில்' : 'Closest'}
+                                </span>
+                              )}
+                              {place.openNow === true && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 border border-emerald-300 text-emerald-950 rounded-full text-[10px] font-bold">
+                                  🟢 {currentLanguage === 'ta' ? 'திறந்துள்ளது' : 'Open'}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-earth-700 leading-relaxed flex items-start gap-1">
+                              <MapPin className="w-3.5 h-3.5 text-earth-500 flex-shrink-0 mt-0.5" />
+                              <span>{place.address}</span>
+                            </p>
+                          </div>
+
+                          {place.distanceKm !== undefined && (
+                            <span className="flex-shrink-0 px-2.5 py-1 bg-teal-100 border border-teal-300 text-teal-950 text-xs font-bold rounded-xl whitespace-nowrap">
+                              {place.distanceKm} km
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Extra contact tags if available */}
+                        {(place.phone || place.website) && (
+                          <div className="flex flex-wrap gap-2 my-2.5 pt-2 border-t border-earth-100 text-xs text-earth-700">
+                            {place.phone && (
+                              <a
+                                href={`tel:${place.phone}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-earth-50 hover:bg-earth-100 text-earth-900 border border-earth-200 rounded-lg font-medium"
+                              >
+                                <Phone className="w-3 h-3 text-emerald-700" />
+                                <span>{place.phone}</span>
+                              </a>
+                            )}
+                            {place.website && (
+                              <a
+                                href={place.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-earth-50 hover:bg-earth-100 text-earth-900 border border-earth-200 rounded-lg font-medium"
+                              >
+                                <Globe className="w-3 h-3 text-teal-700" />
+                                <span>{currentLanguage === 'ta' ? 'இணையதளம்' : 'Website'}</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Actions: Directions | Call | Website/More Details */}
+                        <div className="flex flex-wrap items-center gap-2 mt-3 pt-2 border-t border-earth-100">
+                          {/* 1. Directions Button */}
+                          <a
+                            href={place.directionsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 min-w-[130px] inline-flex items-center justify-center gap-1.5 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition-colors"
+                          >
+                            <Navigation className="w-4 h-4 text-emerald-200" />
+                            <span>{currentLanguage === 'ta' ? 'வழிகாட்டு (Directions)' : 'Directions ➔'}</span>
+                          </a>
+
+                          {/* 2. Call Button if phone available */}
+                          {place.phone && (
+                            <a
+                              href={`tel:${place.phone}`}
+                              className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white hover:bg-earth-100 text-earth-900 border border-earth-300 rounded-xl text-xs sm:text-sm font-semibold transition-colors"
+                            >
+                              <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>{currentLanguage === 'ta' ? 'அழைக்க' : 'Call'}</span>
+                            </a>
+                          )}
+
+                          {/* 3. Website / More Details */}
+                          <a
+                            href={place.website || place.mapUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white hover:bg-earth-100 text-earth-900 border border-earth-300 rounded-xl text-xs sm:text-sm font-semibold transition-colors"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5 text-earth-600" />
+                            <span>{currentLanguage === 'ta' ? 'கூடுதல் விவரம்' : 'Details'}</span>
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* If 0 results found */}
+            {resource.locationData.status === 'no_results' && (
+              <div className="p-5 bg-earth-50 border border-earth-200 rounded-2xl text-center">
+                <AlertCircle className="w-8 h-8 text-earth-500 mx-auto mb-2" />
+                <p className="text-xs sm:text-sm text-earth-800 font-medium mb-3">
+                  {currentLanguage === 'ta'
+                    ? 'மன்னிக்கவும், இந்த இடத்தில் உடனடியாக தகுதியான முடிவுகள் கிடைக்கவில்லை.'
+                    : "I couldn't find a suitable place nearby."}
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onFollowUp) {
+                        onFollowUp(`Find ${resource.locationData?.queryCategory || 'places'} in Chennai`);
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-white border border-earth-300 text-earth-900 text-xs font-semibold rounded-lg hover:bg-earth-100"
+                  >
+                    {currentLanguage === 'ta' ? 'சென்னை பகுதியில் தேடுக' : 'Search wider area (10 km)'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const area = prompt(
+                        currentLanguage === 'ta' ? 'உங்கள் ஊரின் பெயரை உள்ளிடவும்:' : 'Enter area name:'
+                      );
+                      if (area && onFollowUp) {
+                        onFollowUp(`Find ${resource.locationData?.queryCategory || 'places'} in ${area}`);
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-white border border-earth-300 text-earth-900 text-xs font-semibold rounded-lg hover:bg-earth-100"
+                  >
+                    {currentLanguage === 'ta' ? 'வேறு ஊரில் தேட' : 'Choose another location'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* What It Helps / Explanation */}
         <div className="my-5 p-4 bg-harshu-50 rounded-2xl border border-harshu-200/80">
           <span className="text-xs font-bold text-harshu-800 uppercase tracking-wider block mb-1">
@@ -535,6 +808,20 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
               </span>
               <ArrowUpRight className="w-4 h-4 text-emerald-700" />
             </button>
+          )}
+
+          {/* External Portal Language Advisory */}
+          {resource.officialUrl && resource.officialUrl !== '#' && (
+            <div className="flex items-start gap-2 bg-amber-50/90 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-950">
+              <Globe className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <p>
+                {currentLanguage === 'ta'
+                  ? 'குறிப்பு: இந்த அதிகாரப்பூர்வ தளம் ஆங்கிலம் அல்லது மாநில அரசு இணையதள மொழியில் இருக்கலாம். ஆனால் HARSHU அனைத்து தகவல்கள் மற்றும் வழிகாட்டல்களை உங்கள் தாய்மொழியிலேயே தொடர்ந்து வழங்கும்.'
+                  : currentLanguage === 'hi'
+                  ? 'सूचना: यह आधिकारिक सरकारी वेबसाइट अंग्रेजी या राज्य पोर्टल भाषा में हो सकती है। लेकिन HARSHU के सभी निर्देश आपकी चुनी हुई भाषा में ही रहेंगे।'
+                  : 'Note: This official external website may be in English or portal language. HARSHU provides all instructions and guidance in your selected language.'}
+              </p>
+            </div>
           )}
 
           {/* Verification Source Attribution */}
@@ -671,7 +958,17 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                 {resource.officialUrl}
               </div>
 
-              <div className="text-xs text-emerald-900 leading-relaxed space-y-1">
+              <div className="text-xs text-emerald-900 leading-relaxed space-y-1.5">
+                <p className="flex items-start gap-1.5 text-emerald-900">
+                  <Globe className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                  <span>
+                    {currentLanguage === 'ta'
+                      ? 'அதிகாரப்பூர்வ தளம் ஆங்கிலம் அல்லது மாநில மொழியில் இருக்கலாம். ஆனால் வழிகாட்டல் அனைத்தும் HARSHU-வில் உங்கள் மொழியிலேயே இருக்கும்.'
+                      : currentLanguage === 'hi'
+                      ? 'आधिकारिक पोर्टल अंग्रेजी में हो सकता है, लेकिन HARSHU पर सभी दिशा-निर्देश आपकी चुनी हुई भाषा में ही रहेंगे।'
+                      : 'The external website may be in English or portal language. HARSHU will keep all guidance in your selected language.'}
+                  </span>
+                </p>
                 <p className="pt-1 font-semibold text-emerald-950">
                   {currentLanguage === 'ta'
                     ? '🌿 பயப்பட வேண்டாம்! எந்த உதவி அல்லது சந்தேகம் இருந்தாலும் எப்போது வேண்டுமானாலும் HARSHU-விற்கு திரும்பி வரலாம்.'
