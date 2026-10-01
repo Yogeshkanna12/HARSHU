@@ -24,15 +24,41 @@ export type ScreenState =
   | 'do_it_with_me'
   | 'completion';
 
-export type IntentCategory = 'jobs' | 'skills' | 'services' | 'welfare' | 'scholarship' | 'other';
+export type TaskType =
+  | 'travel'
+  | 'navigation'
+  | 'booking'
+  | 'cooking'
+  | 'technology'
+  | 'payment'
+  | 'government'
+  | 'health'
+  | 'education'
+  | 'general'
+  | 'jobs'
+  | 'skills'
+  | 'services'
+  | 'welfare'
+  | 'scholarship'
+  | 'other';
+
+export type IntentCategory = TaskType;
 
 export interface ClarificationQuestion {
   text: string;
   options: string[];
 }
 
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'model';
+  text: string;
+  timestamp: number;
+}
+
 export interface IntentResult {
   category: IntentCategory;
+  taskType?: TaskType;
   rawInput: string;
   recognizedText: string;
   detectedLanguage: Language;
@@ -44,6 +70,12 @@ export interface IntentResult {
   discoveredResource?: Resource;
   clarificationQuestion?: ClarificationQuestion;
   isAiGenerated?: boolean;
+  mode?: 'direct_answer' | 'guided' | 'recipe' | 'travel' | 'service';
+  followupSuggestions?: Record<string, string[]>;
+  conversationHistory?: ChatMessage[];
+  primaryActionLabel?: Record<string, string>;
+  recipeData?: RecipeData;
+  travelData?: TravelData;
 }
 
 export interface QuestionOption {
@@ -76,22 +108,49 @@ export interface GuidedStep {
 
 export type SourceType = 'official' | 'government-backed' | 'other';
 
+export interface RecipeData {
+  ingredients: Record<string, string[]>;
+  prepTime: string;
+  cookTime: string;
+  servings: string;
+  tips?: Record<string, string[]>;
+}
+
+export interface TravelData {
+  origin?: string | Record<string, string>;
+  destination?: string | Record<string, string>;
+  transitType?: 'bus' | 'train' | 'metro' | 'walk';
+  boardingPoint?: Record<string, string>;
+  frequency?: Record<string, string>;
+  duration?: string | Record<string, string>;
+  routeNumbers?: string[];
+  mapUrl?: string;
+}
+
 export interface Resource {
   id: string;
   title: Record<string, string>;
   department: Record<string, string>;
   whatItHelps: Record<string, string>;
+  simpleExplanation?: Record<string, string>;
   whoItIsFor: Record<string, string>;
   eligibility: Record<string, string[]>;
   documents: Record<string, string[]>;
   officialSource: string;
   officialSourceName?: string;
-  officialUrl: string; // The real, verified destination URL (MUST NOT BE FAKE)
+  officialUrl: string; // Real, verified destination URL
   sourceType: SourceType;
   verified: boolean;
   domainHierarchy?: string;
   lastVerified?: string;
   category: IntentCategory;
+  taskType?: TaskType;
+  mode?: 'direct_answer' | 'guided' | 'recipe' | 'travel' | 'service';
+  recipeData?: RecipeData;
+  travelData?: TravelData;
+  primaryActionLabel?: Record<string, string>;
+  primaryActionType?: 'do_it_with_me' | 'open_website' | 'open_map' | 'cook_together' | 'none';
+  followupSuggestions?: Record<string, string[]>;
   questions?: Question[];
   steps: Record<string, GuidedStep[]>;
 }

@@ -111,7 +111,18 @@ export const JudgeModal: React.FC<JudgeModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* 4. Simulated Demo Metrics (Transparently Labeled) */}
+        {/* 4. Universal Multilingual Digital Companion Scope */}
+        <div className="mb-6 p-4 bg-amber-50/80 rounded-2xl border border-amber-300 text-xs text-amber-950 space-y-2">
+          <div className="flex items-center gap-1.5 font-bold text-amber-950 mb-1">
+            <Sparkles className="w-4 h-4 text-amber-700" />
+            <span>Universal AI Companion Architecture (Beyond Government Schemes):</span>
+          </div>
+          <p>• <strong>Open-Ended Everyday Understanding:</strong> HARSHU is a Universal Digital Companion for first-time women internet users. She can ask about <em>Travel (buses to Kanchipuram)</em>, <em>Navigation (Chennai Central to Park subway)</em>, <em>Cinema booking (online movie seats)</em>, <em>Cooking (Dum Biriyani)</em>, <em>Everyday Technology (WhatsApp setup)</em>, <em>Utility Payments (TANGEDCO electricity bill)</em>, and <em>General Knowledge (Aadhaar, photosynthesis)</em>.</p>
+          <p>• <strong>Contextual Mode-Adaptive UI:</strong> Automatically tailors presentation into Guided Task, Recipe Companion with ingredients & dum timers, Travel Route with boarding platforms, or Direct Answer cards.</p>
+          <p>• <strong>Conversational Follow-Up Continuity:</strong> Maintains dialogue history so users can ask follow-ups ("What is the fee?", "How much time?") without losing the previous context.</p>
+        </div>
+
+        {/* 5. Simulated Demo Metrics (Transparently Labeled) */}
         <div className="mb-6 p-4 bg-white rounded-2xl border border-earth-200">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-earth-700">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Language, ScreenState, IntentResult, Resource } from './types';
+import { Language, ScreenState, IntentResult, Resource, ChatMessage } from './types';
 import { HarshuOpening } from './components/harshu/HarshuOpening';
 import { Header } from './components/harshu/Header';
 import { HomeView } from './components/harshu/HomeView';
@@ -21,9 +21,10 @@ export const App: React.FC = () => {
   const [voiceMode, setVoiceMode] = useState<'voice' | 'text'>('voice');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Active task context
+  // Active task context & conversational history
   const [currentIntent, setCurrentIntent] = useState<IntentResult | null>(null);
   const [activeResource, setActiveResource] = useState<Resource>(VERIFIED_SCHEMES[0]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isJudgeModalOpen, setIsJudgeModalOpen] = useState(false);
 
   // Transitions
@@ -48,41 +49,57 @@ export const App: React.FC = () => {
   const handleSelectCategory = async (category: string, promptText?: string) => {
     const raw =
       promptText ||
-      (category === 'skills'
+      (category === 'travel'
+        ? 'காஞ்சிபுரத்துக்கு பேருந்து எங்கே கிடைக்கும்?'
+        : category === 'navigation'
+        ? 'சென்னை சென்ட்ரலில் இருந்து பார்க் ஸ்டேஷன் போவது எப்படி?'
+        : category === 'booking'
+        ? 'சினிமா டிக்கெட் ஆன்லைனில் புக் செய்வது எப்படி?'
+        : category === 'cooking'
+        ? 'சுவையான பிரியாணி செய்வது எப்படி?'
+        : category === 'technology'
+        ? 'வாட்ஸ்அப் கணக்கு தொடங்குவது எப்படி?'
+        : category === 'payment'
+        ? 'கரண்ட் பில் ஆன்லைனில் கட்டுவது எப்படி?'
+        : category === 'skills'
         ? 'எனக்கு தையல் கற்றுக்கணும், உதவி கிடைக்குமா?'
         : category === 'jobs'
         ? 'எனக்கு வேலை வேண்டும்.'
         : category === 'scholarship'
-        ? 'மாணவர்களுக்கான இலவசக் கல்வி உதவித்தொகை பற்றி நான் தெரிந்துகொள்ள விரும்புகிறேன். அரசாங்கத்தின் சார்பில் ஏதேனும் கல்வி உதவித்தொகை வழங்கப்படுகிறதா?'
-        : category === 'welfare'
-        ? 'மகளிர் உரிமைத் தொகை விண்ணப்பிப்பது எப்படி?'
-        : 'எனக்கு அரசு உதவி வேண்டும்.');
+        ? 'மாணவர்களுக்கான இலவசக் கல்வி உதவித்தொகை பற்றி நான் தெரிந்துகொள்ள விரும்புகிறேன்.'
+        : 'எனக்கு உதவி வேண்டும்.');
 
-    setIsAnalyzing(true);
-    try {
-      const intentResult = await detectIntentAsync(raw, currentLanguage);
-      setCurrentIntent(intentResult);
-      if (intentResult.detectedLanguage) {
-        setCurrentLanguage(intentResult.detectedLanguage);
-      }
-      const res = intentResult.discoveredResource || getSchemeById(intentResult.schemeId);
-      setActiveResource(res);
-      setScreenState('intent_confirm');
-    } finally {
-      setIsAnalyzing(false);
-    }
+    await handleInputSubmit(raw);
   };
 
   const handleInputSubmit = async (text: string) => {
     setIsAnalyzing(true);
+    const userMsg: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      text,
+      timestamp: Date.now(),
+    };
+    const updatedHistory = [...chatHistory, userMsg];
+    setChatHistory(updatedHistory);
+
     try {
-      const intentResult = await detectIntentAsync(text, currentLanguage);
+      const intentResult = await detectIntentAsync(text, currentLanguage, updatedHistory);
       setCurrentIntent(intentResult);
       if (intentResult.detectedLanguage) {
         setCurrentLanguage(intentResult.detectedLanguage);
       }
       const res = intentResult.discoveredResource || getSchemeById(intentResult.schemeId);
       setActiveResource(res);
+
+      const modelMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'model',
+        text: intentResult.directAnswer || intentResult.interpretedMeaning,
+        timestamp: Date.now(),
+      };
+      setChatHistory([...updatedHistory, modelMsg]);
+
       setScreenState('intent_confirm');
     } finally {
       setIsAnalyzing(false);
@@ -90,11 +107,13 @@ export const App: React.FC = () => {
   };
 
   const handleIntentConfirmed = () => {
-    if (activeResource.questions && activeResource.questions.length > 0) {
-      setScreenState('question_flow');
-    } else {
+    // If it's a direct explanation or has no questions, navigate straight to the resource/answer card
+    if (activeResource.mode === 'direct_answer' || !activeResource.questions || activeResource.questions.length === 0) {
       setScreenState('resource_preview');
+      return;
     }
+
+    setScreenState('question_flow');
   };
 
   const handleQuestionsCompleted = () => {
@@ -112,6 +131,7 @@ export const App: React.FC = () => {
   const handleRestartJourney = () => {
     setScreenState('home');
     setCurrentIntent(null);
+    setChatHistory([]);
   };
 
   // Safe Back Navigation
@@ -226,6 +246,7 @@ export const App: React.FC = () => {
                 resource={activeResource}
                 onStartGuidedTask={handleStartGuidedTask}
                 onBack={handleBack}
+                onFollowUp={(query) => handleInputSubmit(query)}
               />
             )}
 

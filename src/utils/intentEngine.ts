@@ -1,4 +1,4 @@
-import { IntentResult, Language, Resource } from '../types';
+import { IntentResult, Language, Resource, ChatMessage } from '../types';
 import { VERIFIED_SCHEMES } from '../data/schemes';
 import { understandUserNeed, detectLanguageFromText } from './aiService';
 import {
@@ -6,23 +6,61 @@ import {
   discoverOfficialResource,
   buildResourceFromEntry,
 } from './resourceDiscovery';
+import { UNIVERSAL_RESOURCES, matchUniversalResource } from './universalKnowledge';
 
 export async function detectIntentAsync(
   rawText: string,
-  preferredLang: Language
+  preferredLang: Language,
+  history?: ChatMessage[]
 ): Promise<IntentResult> {
-  const result = await understandUserNeed(rawText, preferredLang);
+  const result = await understandUserNeed(rawText, preferredLang, history);
+  if (result.discoveredResource) {
+    return result;
+  }
   const discovered = await discoverOfficialResource(rawText, preferredLang);
   return {
     ...result,
-    schemeId: discovered.id,
-    discoveredResource: discovered,
+    schemeId: result.schemeId || discovered.id,
+    discoveredResource: result.discoveredResource || discovered,
   };
 }
 
 // Synchronous wrapper for instant fallback/testing
 export function detectIntent(rawText: string, preferredLang: Language): IntentResult {
   const detected = detectLanguageFromText(rawText, preferredLang);
+
+  const univMatch = matchUniversalResource(rawText);
+  if (univMatch) {
+    const meaning = univMatch.whatItHelps[detected] || univMatch.whatItHelps[preferredLang] || univMatch.whatItHelps.en;
+    const answer =
+      (univMatch.simpleExplanation && (univMatch.simpleExplanation[detected] || univMatch.simpleExplanation[preferredLang] || univMatch.simpleExplanation.en)) ||
+      univMatch.whatItHelps[detected] ||
+      univMatch.whatItHelps[preferredLang] ||
+      univMatch.whatItHelps.en;
+    return {
+      category: univMatch.category,
+      taskType: univMatch.taskType,
+      mode: univMatch.mode,
+      rawInput: rawText,
+      recognizedText: rawText,
+      detectedLanguage: detected,
+      detectedLanguageName: detected,
+      interpretedMeaning: meaning,
+      directAnswer: answer,
+      summaryByLanguage: {
+        ta: univMatch.whatItHelps.ta || meaning,
+        hi: univMatch.whatItHelps.hi || meaning,
+        en: univMatch.whatItHelps.en || meaning,
+      },
+      schemeId: univMatch.id,
+      discoveredResource: univMatch,
+      primaryActionLabel: univMatch.primaryActionLabel,
+      recipeData: univMatch.recipeData,
+      travelData: univMatch.travelData,
+      isAiGenerated: false,
+    };
+  }
+
   // Call understandUserNeed internally (synchronous fallback logic)
   const lower = rawText.toLowerCase().trim();
 
@@ -159,6 +197,9 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
 }
 
 export function getSchemeById(schemeId: string): Resource {
+  const universalFound = UNIVERSAL_RESOURCES.find((u) => u.id === schemeId);
+  if (universalFound) return universalFound;
+
   const found = VERIFIED_SCHEMES.find((s) => s.id === schemeId);
   if (found) return found;
 
@@ -167,5 +208,5 @@ export function getSchemeById(schemeId: string): Resource {
     return buildResourceFromEntry(registryMatch);
   }
 
-  return VERIFIED_SCHEMES[0];
+  return UNIVERSAL_RESOURCES[0] || VERIFIED_SCHEMES[0];
 }
