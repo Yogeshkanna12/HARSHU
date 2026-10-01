@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Language, Resource } from '../../types';
-import { UI_TRANSLATIONS } from '../../utils/translations';
+import { UI_TRANSLATIONS, getT } from '../../utils/translations';
 import {
   Volume2,
   HelpCircle,
@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   Sparkles,
   Info,
-  RefreshCw,
 } from 'lucide-react';
 import { speakText } from '../../utils/speech';
 
@@ -27,7 +26,13 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
   onComplete,
   onBackToResource,
 }) => {
-  const steps = resource.steps[currentLanguage];
+  const steps =
+    resource.steps[currentLanguage] ||
+    resource.steps['ta'] ||
+    resource.steps['en'] ||
+    Object.values(resource.steps)[0] ||
+    [];
+
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showSimplified, setShowSimplified] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -39,6 +44,7 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
   const remainingSteps = totalSteps - currentStepNumber;
 
   const handleListenStep = (isSimplified: boolean) => {
+    if (!step) return;
     const textToSpeak = isSimplified
       ? `${step.simplifiedInstruction} ${step.example}`
       : `${step.title}. ${step.instruction}`;
@@ -51,7 +57,6 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
   };
 
   const handleNextStepClick = () => {
-    // Show gentle confirmation before finalizing step
     setShowStepConfirmModal(true);
   };
 
@@ -77,6 +82,18 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
     }
   };
 
+  if (!step) return null;
+
+  const stepProgressFn =
+    UI_TRANSLATIONS.stepProgress[currentLanguage] ||
+    UI_TRANSLATIONS.stepProgress['ta'] ||
+    UI_TRANSLATIONS.stepProgress['en'];
+
+  const stepsRemainingFn =
+    UI_TRANSLATIONS.stepsRemaining[currentLanguage] ||
+    UI_TRANSLATIONS.stepsRemaining['ta'] ||
+    UI_TRANSLATIONS.stepsRemaining['en'];
+
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 animate-fade-in">
       {/* Top Banner: Do It With Me + Remaining steps */}
@@ -87,15 +104,15 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
           className="text-xs font-semibold text-earth-700 hover:text-harshu-900 flex items-center gap-1.5 p-1"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>{UI_TRANSLATIONS.previousStep[currentLanguage]}</span>
+          <span>{getT(UI_TRANSLATIONS.previousStep, currentLanguage)}</span>
         </button>
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-harshu-800 bg-harshu-100 px-3 py-1 rounded-full border border-harshu-200">
-            {UI_TRANSLATIONS.stepProgress[currentLanguage](currentStepNumber, totalSteps)}
+            {stepProgressFn ? stepProgressFn(currentStepNumber, totalSteps) : `Step ${currentStepNumber} of ${totalSteps}`}
           </span>
           <span className="text-xs font-medium text-earth-700 hidden sm:inline">
-            ({UI_TRANSLATIONS.stepsRemaining[currentLanguage](remainingSteps)})
+            ({stepsRemainingFn ? stepsRemainingFn(remainingSteps) : `${remainingSteps} steps left`})
           </span>
         </div>
       </div>
@@ -124,7 +141,7 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
             title="Listen step aloud"
           >
             <Volume2 className="w-5 h-5" />
-            <span>{UI_TRANSLATIONS.listenAloud[currentLanguage]}</span>
+            <span>{getT(UI_TRANSLATIONS.listenAloud, currentLanguage)}</span>
           </button>
         </div>
 
@@ -165,7 +182,11 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
 
             <div className="mt-3 flex items-center justify-between">
               <span className="text-xs text-amber-800 font-medium">
-                {currentLanguage === 'ta' ? '🌿 அமைதியாக இருங்கள், உங்களால் முடியும்!' : currentLanguage === 'hi' ? '🌿 चिंता न करें, आप आराम से कर सकती हैं!' : '🌿 Take your time, you can do this!'}
+                {currentLanguage === 'ta'
+                  ? '🌿 அமைதியாக இருங்கள், உங்களால் முடியும்!'
+                  : currentLanguage === 'hi'
+                  ? '🌿 चिंता न करें, आप आराम से कर सकती हैं!'
+                  : '🌿 Take your time, you can do this!'}
               </span>
               <button
                 type="button"
@@ -173,7 +194,7 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
                 className="text-xs font-bold text-amber-900 hover:text-amber-950 underline flex items-center gap-1"
               >
                 <Volume2 className="w-3.5 h-3.5" />
-                <span>{UI_TRANSLATIONS.listenAloud[currentLanguage]}</span>
+                <span>{getT(UI_TRANSLATIONS.listenAloud, currentLanguage)}</span>
               </button>
             </div>
           </div>
@@ -185,7 +206,7 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
               className="text-xs sm:text-sm font-bold text-amber-800 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-200/90 px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-2xs active:scale-95"
             >
               <HelpCircle className="w-4 h-4 text-amber-700" />
-              <span>{UI_TRANSLATIONS.iDontUnderstand[currentLanguage]}</span>
+              <span>{getT(UI_TRANSLATIONS.iDontUnderstand, currentLanguage)}</span>
             </button>
           </div>
         )}
@@ -194,10 +215,14 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
         {step.options && step.options.length > 0 && (
           <div className="space-y-2.5 mb-8">
             <span className="text-xs font-bold uppercase tracking-wider text-earth-600 block mb-1">
-              {currentLanguage === 'ta' ? 'கீழே உள்ளதை தேர்வு செய்யவும்:' : currentLanguage === 'hi' ? 'नीचे दिए गए विकल्प पर टैप करें:' : 'Choose option to proceed:'}
+              {currentLanguage === 'ta'
+                ? 'கீழே உள்ளதை தேர்வு செய்யவும்:'
+                : currentLanguage === 'hi'
+                ? 'नीचे दिए गए विकल्प पर टैप करें:'
+                : 'Choose option to proceed:'}
             </span>
             {step.options.map((optionText, idx) => {
-              const isSelected = selectedOption === optionText || (step.options?.length === 1);
+              const isSelected = selectedOption === optionText || step.options?.length === 1;
               return (
                 <button
                   key={idx}
@@ -241,7 +266,7 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
                   : currentLanguage === 'hi'
                   ? 'कार्य पूरा करें 🎉'
                   : 'Complete Task 🎉'
-                : UI_TRANSLATIONS.markDone[currentLanguage]}
+                : getT(UI_TRANSLATIONS.markDone, currentLanguage)}
             </span>
             <ArrowRight className="w-5 h-5 text-harshu-300" />
           </button>
@@ -250,7 +275,7 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
         {/* Safety Microcopy */}
         <div className="flex items-center justify-center gap-1.5 mt-5 text-xs text-earth-600">
           <ShieldCheck className="w-4 h-4 text-harshu-600" />
-          <span>{UI_TRANSLATIONS.goBackAnytime[currentLanguage]}</span>
+          <span>{getT(UI_TRANSLATIONS.goBackAnytime, currentLanguage)}</span>
         </div>
       </div>
 
@@ -291,7 +316,11 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
                 onClick={() => setShowStepConfirmModal(false)}
                 className="w-full py-2.5 bg-earth-100 hover:bg-earth-200 text-earth-800 rounded-xl font-semibold text-xs"
               >
-                {currentLanguage === 'ta' ? 'இல்லை, இன்னொரு முறை பார்க்கிறேன்' : currentLanguage === 'hi' ? 'नहीं, एक बार फिर देखना है' : 'Check this step again'}
+                {currentLanguage === 'ta'
+                  ? 'இல்லை, இன்னொரு முறை பார்க்கிறேன்'
+                  : currentLanguage === 'hi'
+                  ? 'नहीं, एक बार फिर देखना है'
+                  : 'Check this step again'}
               </button>
             </div>
           </div>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { GlyphPortal } from '../ui/glyph-portal';
-import { HARSHU_ACRONYM, UI_TRANSLATIONS } from '../../utils/translations';
+import { HARSHU_ACRONYM, UI_TRANSLATIONS, getT } from '../../utils/translations';
 import { Language } from '../../types';
-import { Mic, Keyboard, ArrowRight, ShieldCheck, Heart, Sparkles, Volume2 } from 'lucide-react';
-import { speakText } from '../../utils/speech';
+import { Mic, Keyboard, ArrowRight, ShieldCheck, Heart, Sparkles, Volume2, Globe, ChevronDown } from 'lucide-react';
+import { speakText, SUPPORTED_LANGUAGES } from '../../utils/speech';
 
 interface HarshuOpeningProps {
   currentLanguage: Language;
@@ -21,20 +21,25 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
   onEnterCompanion,
 }) => {
   const [selectedLetter, setSelectedLetter] = useState<number | null>(null);
+  const [showLangMenu, setShowLangMenu] = useState(false);
 
   // Annotations mapped from HARSHU acronym
   const annotations = HARSHU_ACRONYM.map((item) => ({
     char: item.letter,
-    label: `${item.word} (${item.meaning[currentLanguage]})`,
-    sub: item.description[currentLanguage],
+    label: `${item.word} (${item.meaning[currentLanguage] || item.meaning['ta'] || item.meaning['en']})`,
+    sub: item.description[currentLanguage] || item.description['ta'] || item.description['en'],
   }));
 
+  const tagline = getT(UI_TRANSLATIONS.tagline, currentLanguage);
+  const subTagline = getT(UI_TRANSLATIONS.subTagline, currentLanguage);
+
   const handleListenTagline = () => {
-    speakText(
-      `${UI_TRANSLATIONS.tagline[currentLanguage]}. ${UI_TRANSLATIONS.subTagline[currentLanguage]}`,
-      currentLanguage
-    );
+    speakText(`${tagline}. ${subTagline}`, currentLanguage);
   };
+
+  const currentLangMeta =
+    SUPPORTED_LANGUAGES.find((l) => l.code === currentLanguage) ||
+    SUPPORTED_LANGUAGES[0];
 
   return (
     <div className="relative w-full min-h-screen bg-[#faf8f5] text-[#1c2826] overflow-x-hidden">
@@ -54,41 +59,43 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
           </div>
         </div>
 
-        {/* Language Switcher */}
-        <div className="flex items-center gap-1.5 bg-earth-100/90 p-1 rounded-2xl border border-earth-200">
+        {/* Multilingual Switcher Dropdown */}
+        <div className="relative">
           <button
             type="button"
-            onClick={() => onSelectLanguage('ta')}
-            className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-              currentLanguage === 'ta'
-                ? 'bg-harshu-800 text-white shadow-sm'
-                : 'text-earth-800 hover:bg-earth-200/60'
-            }`}
+            onClick={() => setShowLangMenu(!showLangMenu)}
+            className="flex items-center gap-1.5 bg-earth-100/90 hover:bg-earth-200 border border-earth-300 px-3 py-1.5 rounded-2xl text-xs sm:text-sm font-bold text-harshu-950 transition-colors shadow-2xs"
           >
-            தமிழ்
+            <Globe className="w-3.5 h-3.5 text-harshu-700" />
+            <span>{currentLangMeta.nativeLabel}</span>
+            <ChevronDown className="w-3.5 h-3.5 text-earth-600" />
           </button>
-          <button
-            type="button"
-            onClick={() => onSelectLanguage('hi')}
-            className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-              currentLanguage === 'hi'
-                ? 'bg-harshu-800 text-white shadow-sm'
-                : 'text-earth-800 hover:bg-earth-200/60'
-            }`}
-          >
-            हिन्दी
-          </button>
-          <button
-            type="button"
-            onClick={() => onSelectLanguage('en')}
-            className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-              currentLanguage === 'en'
-                ? 'bg-harshu-800 text-white shadow-sm'
-                : 'text-earth-800 hover:bg-earth-200/60'
-            }`}
-          >
-            English
-          </button>
+
+          {showLangMenu && (
+            <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-earth-300 rounded-2xl shadow-xl p-2 z-50 grid grid-cols-1 gap-1 max-h-80 overflow-y-auto animate-slide-up">
+              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-earth-500 border-b border-earth-100 mb-1">
+                Choose Language (13 Languages):
+              </div>
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => {
+                    onSelectLanguage(lang.code);
+                    setShowLangMenu(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors ${
+                    currentLanguage === lang.code
+                      ? 'bg-harshu-100 text-harshu-900 font-bold'
+                      : 'hover:bg-earth-100 text-earth-800'
+                  }`}
+                >
+                  <span>{lang.nativeLabel}</span>
+                  <span className="text-[10px] text-earth-500 font-normal">{lang.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
@@ -123,7 +130,7 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
           {/* Tagline & Listen Button */}
           <div className="flex items-center justify-center gap-2 mb-2">
             <h1 className="text-2xl sm:text-4xl font-extrabold text-harshu-950 tracking-tight">
-              {UI_TRANSLATIONS.tagline[currentLanguage]}
+              {tagline}
             </h1>
             <button
               type="button"
@@ -137,7 +144,7 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
           </div>
 
           <p className="text-sm sm:text-base text-earth-800 max-w-xl font-normal leading-relaxed mb-6">
-            {UI_TRANSLATIONS.subTagline[currentLanguage]}
+            {subTagline}
           </p>
 
           {/* Action Buttons: Voice First & Text Option */}
@@ -149,7 +156,7 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
               className="w-full sm:w-auto flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-harshu-800 hover:bg-harshu-900 active:bg-harshu-950 text-white rounded-2xl text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
             >
               <Mic className="w-6 h-6 text-harshu-300 animate-pulse" />
-              <span>{UI_TRANSLATIONS.startSpeaking[currentLanguage]}</span>
+              <span>{getT(UI_TRANSLATIONS.startSpeaking, currentLanguage)}</span>
             </button>
 
             {/* Secondary Text Action */}
@@ -159,7 +166,7 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
               className="w-full sm:w-auto px-5 py-4 bg-white hover:bg-earth-100 text-harshu-900 border border-earth-300 rounded-2xl text-sm sm:text-base font-semibold shadow-sm hover:shadow transition-all flex items-center justify-center gap-2"
             >
               <Keyboard className="w-5 h-5 text-harshu-700" />
-              <span>{UI_TRANSLATIONS.typeInstead[currentLanguage]}</span>
+              <span>{getT(UI_TRANSLATIONS.typeInstead, currentLanguage)}</span>
             </button>
           </div>
 
@@ -169,7 +176,7 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
             onClick={onEnterCompanion}
             className="mt-4 text-xs sm:text-sm font-semibold text-harshu-700 hover:text-harshu-900 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-harshu-50 transition-colors"
           >
-            <span>{UI_TRANSLATIONS.enterHarshu[currentLanguage]}</span>
+            <span>{getT(UI_TRANSLATIONS.enterHarshu, currentLanguage)}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -187,10 +194,10 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
               HARSHU Philosophy
             </span>
             <h2 className="text-lg sm:text-xl font-bold mt-1 text-white">
-              "{UI_TRANSLATIONS.corePhilosophy[currentLanguage]}"
+              "{getT(UI_TRANSLATIONS.corePhilosophy, currentLanguage)}"
             </h2>
             <p className="text-xs sm:text-sm text-harshu-200/90 mt-1.5">
-              You don't need to know technology. Just speak or touch what you need. HARSHU will guide you one step at a time.
+              You don't need to know technology. Just speak or touch what you need in your own language. HARSHU understands meaning and will guide you one step at a time.
             </p>
           </div>
         </div>
@@ -210,34 +217,38 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {HARSHU_ACRONYM.map((item, idx) => (
-              <div
-                key={item.word}
-                onClick={() => setSelectedLetter(idx)}
-                className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-                  selectedLetter === idx
-                    ? 'bg-harshu-50 border-harshu-500 shadow-md ring-2 ring-harshu-400'
-                    : 'bg-white border-earth-200 hover:border-harshu-300 hover:shadow-sm'
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="w-10 h-10 rounded-xl bg-harshu-800 text-white font-extrabold text-xl flex items-center justify-center">
-                    {item.letter}
-                  </span>
-                  <div>
-                    <h4 className="font-bold text-harshu-950 text-base">
-                      {item.word}
-                    </h4>
-                    <span className="text-xs text-harshu-700 font-medium">
-                      {item.meaning[currentLanguage]}
+            {HARSHU_ACRONYM.map((item, idx) => {
+              const meaningText = item.meaning[currentLanguage] || item.meaning['ta'] || item.meaning['en'];
+              const descText = item.description[currentLanguage] || item.description['ta'] || item.description['en'];
+              return (
+                <div
+                  key={item.word}
+                  onClick={() => setSelectedLetter(idx)}
+                  className={`p-5 rounded-2xl border transition-all cursor-pointer ${
+                    selectedLetter === idx
+                      ? 'bg-harshu-50 border-harshu-500 shadow-md ring-2 ring-harshu-400'
+                      : 'bg-white border-earth-200 hover:border-harshu-300 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="w-10 h-10 rounded-xl bg-harshu-800 text-white font-extrabold text-xl flex items-center justify-center">
+                      {item.letter}
                     </span>
+                    <div>
+                      <h4 className="font-bold text-harshu-950 text-base">
+                        {item.word}
+                      </h4>
+                      <span className="text-xs text-harshu-700 font-medium">
+                        {meaningText}
+                      </span>
+                    </div>
                   </div>
+                  <p className="text-xs sm:text-sm text-earth-800 mt-2 leading-relaxed">
+                    {descText}
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-earth-800 mt-2 leading-relaxed">
-                  {item.description[currentLanguage]}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -248,14 +259,10 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
           </div>
           <div className="flex-1 text-center md:text-left">
             <h4 className="font-bold text-base sm:text-lg text-harshu-950">
-              {currentLanguage === 'ta'
-                ? 'முழுமையான பாதுகாப்பு மற்றும் எளிய வழிகாட்டல்'
-                : currentLanguage === 'hi'
-                ? 'पूर्ण सुरक्षा एवं सरल मार्गदर्शन'
-                : '100% Emotional & Digital Safety Guarantee'}
+              முழுமையான பாதுகாப்பு மற்றும் எளிய வழிகாட்டல் (100% Safety)
             </h4>
             <p className="text-xs sm:text-sm text-earth-700 mt-1">
-              {UI_TRANSLATIONS.privacyGuarantee[currentLanguage]}
+              {getT(UI_TRANSLATIONS.privacyGuarantee, currentLanguage)}
             </p>
           </div>
           <button
@@ -264,7 +271,7 @@ export const HarshuOpening: React.FC<HarshuOpeningProps> = ({
             className="px-6 py-3.5 bg-harshu-800 hover:bg-harshu-900 text-white rounded-2xl font-bold text-sm sm:text-base flex items-center gap-2 shadow-sm whitespace-nowrap"
           >
             <Sparkles className="w-4 h-4 text-harshu-300" />
-            <span>{UI_TRANSLATIONS.startSpeaking[currentLanguage]}</span>
+            <span>{getT(UI_TRANSLATIONS.startSpeaking, currentLanguage)}</span>
           </button>
         </div>
       </section>

@@ -10,14 +10,16 @@ import { ResourceCard } from './components/harshu/ResourceCard';
 import { GuidedTask } from './components/harshu/GuidedTask';
 import { CompletionScreen } from './components/harshu/CompletionScreen';
 import { JudgeModal } from './components/harshu/JudgeModal';
-import { detectIntent, getSchemeById } from './utils/intentEngine';
+import { detectIntentAsync, getSchemeById } from './utils/intentEngine';
 import { VERIFIED_SCHEMES } from './data/schemes';
+import { Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Current app state
   const [currentLanguage, setCurrentLanguage] = useState<Language>('ta');
   const [screenState, setScreenState] = useState<ScreenState>('opening');
   const [voiceMode, setVoiceMode] = useState<'voice' | 'text'>('voice');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Active task context
   const [currentIntent, setCurrentIntent] = useState<IntentResult | null>(null);
@@ -43,34 +45,49 @@ export const App: React.FC = () => {
     setScreenState('home');
   };
 
-  const handleSelectCategory = (category: string, promptText?: string) => {
-    const raw = promptText || (
-      category === 'skills'
+  const handleSelectCategory = async (category: string, promptText?: string) => {
+    const raw =
+      promptText ||
+      (category === 'skills'
         ? 'எனக்கு தையல் கற்றுக்கணும், உதவி கிடைக்குமா?'
         : category === 'jobs'
         ? 'எனக்கு வேலை வேண்டும்.'
         : category === 'scholarship'
-        ? 'என் மகளுக்கு கல்லூரி உதவித்தொகை இருக்கா?'
+        ? 'மாணவர்களுக்கான இலவசக் கல்வி உதவித்தொகை பற்றி நான் தெரிந்துகொள்ள விரும்புகிறேன். அரசாங்கத்தின் சார்பில் ஏதேனும் கல்வி உதவித்தொகை வழங்கப்படுகிறதா?'
         : category === 'welfare'
         ? 'மகளிர் உரிமைத் தொகை விண்ணப்பிப்பது எப்படி?'
-        : 'எனக்கு அரசு உதவி வேண்டும்.'
-    );
-    const intentResult = detectIntent(raw, currentLanguage);
-    setCurrentIntent(intentResult);
-    setActiveResource(getSchemeById(intentResult.schemeId));
-    setScreenState('intent_confirm');
+        : 'எனக்கு அரசு உதவி வேண்டும்.');
+
+    setIsAnalyzing(true);
+    try {
+      const intentResult = await detectIntentAsync(raw, currentLanguage);
+      setCurrentIntent(intentResult);
+      if (intentResult.detectedLanguage) {
+        setCurrentLanguage(intentResult.detectedLanguage);
+      }
+      setActiveResource(getSchemeById(intentResult.schemeId));
+      setScreenState('intent_confirm');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
-  const handleInputSubmit = (text: string) => {
-    const intentResult = detectIntent(text, currentLanguage);
-    setCurrentIntent(intentResult);
-    setActiveResource(getSchemeById(intentResult.schemeId));
-    setScreenState('intent_confirm');
+  const handleInputSubmit = async (text: string) => {
+    setIsAnalyzing(true);
+    try {
+      const intentResult = await detectIntentAsync(text, currentLanguage);
+      setCurrentIntent(intentResult);
+      if (intentResult.detectedLanguage) {
+        setCurrentLanguage(intentResult.detectedLanguage);
+      }
+      setActiveResource(getSchemeById(intentResult.schemeId));
+      setScreenState('intent_confirm');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleIntentConfirmed = () => {
-    // If the scheme has specific one-at-a-time follow up questions, go to question flow;
-    // Otherwise go directly to resource card
     if (activeResource.questions && activeResource.questions.length > 0) {
       setScreenState('question_flow');
     } else {
@@ -151,7 +168,21 @@ export const App: React.FC = () => {
           />
 
           <main className="flex-1 flex flex-col justify-center py-4">
-            {screenState === 'home' && (
+            {/* Loading spinner while AI understands intent and formulates direct answer */}
+            {isAnalyzing && (
+              <div className="flex flex-col items-center justify-center p-12 text-center animate-fade-in">
+                <div className="w-14 h-14 rounded-full border-4 border-harshu-200 border-t-harshu-800 animate-spin mb-4" />
+                <div className="flex items-center gap-2 text-harshu-900 font-bold text-base">
+                  <Sparkles className="w-4 h-4 text-harshu-600 animate-pulse" />
+                  <span>HARSHU உங்கள் கேள்வியை புரிந்துகொள்கிறது...</span>
+                </div>
+                <p className="text-xs text-earth-600 mt-1">
+                  Understanding meaning and preparing factual guidance in your language
+                </p>
+              </div>
+            )}
+
+            {!isAnalyzing && screenState === 'home' && (
               <HomeView
                 currentLanguage={currentLanguage}
                 onStartVoice={handleStartVoice}
@@ -160,7 +191,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {(screenState === 'listening' || screenState === 'typing') && (
+            {!isAnalyzing && (screenState === 'listening' || screenState === 'typing') && (
               <VoiceInteraction
                 currentLanguage={currentLanguage}
                 initialMode={voiceMode}
@@ -169,7 +200,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {screenState === 'intent_confirm' && currentIntent && (
+            {!isAnalyzing && screenState === 'intent_confirm' && currentIntent && (
               <IntentConfirmation
                 currentLanguage={currentLanguage}
                 intent={currentIntent}
@@ -178,7 +209,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {screenState === 'question_flow' && activeResource.questions && (
+            {!isAnalyzing && screenState === 'question_flow' && activeResource.questions && (
               <QuestionFlow
                 currentLanguage={currentLanguage}
                 questions={activeResource.questions}
@@ -187,7 +218,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {screenState === 'resource_preview' && (
+            {!isAnalyzing && screenState === 'resource_preview' && (
               <ResourceCard
                 currentLanguage={currentLanguage}
                 resource={activeResource}
@@ -196,7 +227,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {screenState === 'do_it_with_me' && (
+            {!isAnalyzing && screenState === 'do_it_with_me' && (
               <GuidedTask
                 currentLanguage={currentLanguage}
                 resource={activeResource}
@@ -205,7 +236,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {screenState === 'completion' && (
+            {!isAnalyzing && screenState === 'completion' && (
               <CompletionScreen
                 currentLanguage={currentLanguage}
                 resource={activeResource}
@@ -226,7 +257,7 @@ export const App: React.FC = () => {
                 onClick={() => setIsJudgeModalOpen(true)}
                 className="text-amber-800 hover:text-amber-950 underline font-medium"
               >
-                ⚖️ Hackathon Story & Architecture
+                ⚖️ Hackathon Story & Multilingual Architecture
               </button>
             </div>
           </footer>

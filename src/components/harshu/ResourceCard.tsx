@@ -1,6 +1,6 @@
 import React from 'react';
 import { Language, Resource } from '../../types';
-import { UI_TRANSLATIONS } from '../../utils/translations';
+import { UI_TRANSLATIONS, getT } from '../../utils/translations';
 import { ShieldCheck, FileText, CheckCircle, ExternalLink, Sparkles, Volume2, ArrowRight } from 'lucide-react';
 import { speakText } from '../../utils/speech';
 
@@ -17,12 +17,22 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
   onStartGuidedTask,
   onBack,
 }) => {
-  const title = resource.title[currentLanguage];
-  const dept = resource.department[currentLanguage];
-  const whatItHelps = resource.whatItHelps[currentLanguage];
-  const whoItIsFor = resource.whoItIsFor[currentLanguage];
-  const eligibility = resource.eligibility[currentLanguage];
-  const documents = resource.documents[currentLanguage];
+  const title = getT(resource.title, currentLanguage);
+  const dept = getT(resource.department, currentLanguage);
+  const whatItHelps = getT(resource.whatItHelps, currentLanguage);
+  const whoItIsFor = getT(resource.whoItIsFor, currentLanguage);
+  const eligibility =
+    resource.eligibility[currentLanguage] ||
+    resource.eligibility['ta'] ||
+    resource.eligibility['en'] ||
+    Object.values(resource.eligibility)[0] ||
+    [];
+  const documents =
+    resource.documents[currentLanguage] ||
+    resource.documents['ta'] ||
+    resource.documents['en'] ||
+    Object.values(resource.documents)[0] ||
+    [];
 
   const handleListenAll = () => {
     speakText(`${title}. ${whatItHelps}. ${whoItIsFor}`, currentLanguage);
@@ -34,12 +44,12 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-          <span>{UI_TRANSLATIONS.officialSourceBadge[currentLanguage]}</span>
+          <span>{getT(UI_TRANSLATIONS.officialSourceBadge, currentLanguage)}</span>
         </span>
 
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
           <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-          <span>{UI_TRANSLATIONS.harshuExplanationBadge[currentLanguage]}</span>
+          <span>{getT(UI_TRANSLATIONS.harshuExplanationBadge, currentLanguage)}</span>
         </span>
       </div>
 
@@ -70,7 +80,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         {/* What It Helps */}
         <div className="my-5 p-4 bg-harshu-50 rounded-2xl border border-harshu-200/80">
           <span className="text-xs font-bold text-harshu-800 uppercase tracking-wider block mb-1">
-            {currentLanguage === 'ta' ? 'இந்த உதவி உங்களுக்கு என்ன தரும்?' : currentLanguage === 'hi' ? 'यह योजना आपके लिए क्या करेगी?' : 'What this helps with:'}
+            {currentLanguage === 'ta'
+              ? 'இந்த உதவி உங்களுக்கு என்ன தரும்?'
+              : currentLanguage === 'hi'
+              ? 'यह योजना आपके लिए क्या करेगी?'
+              : 'What this helps with:'}
           </span>
           <p className="text-sm sm:text-base font-medium text-harshu-950 leading-relaxed">
             {whatItHelps}
@@ -80,7 +94,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
         {/* Who it is for */}
         <div className="mb-6">
           <h3 className="text-xs font-bold uppercase tracking-wider text-earth-600 mb-1">
-            {currentLanguage === 'ta' ? 'யாருக்கான திட்டம்?' : currentLanguage === 'hi' ? 'यह किसके लिए है?' : 'Who it is for:'}
+            {currentLanguage === 'ta'
+              ? 'யாருக்கான திட்டம்?'
+              : currentLanguage === 'hi'
+              ? 'यह किसके लिए है?'
+              : 'Who it is for:'}
           </h3>
           <p className="text-sm font-semibold text-earth-900">
             {whoItIsFor}
@@ -144,7 +162,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
             onClick={onStartGuidedTask}
             className="w-full py-4 px-6 bg-gradient-to-r from-harshu-800 to-harshu-900 hover:from-harshu-900 hover:to-harshu-950 text-white rounded-2xl text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
           >
-            <span>{UI_TRANSLATIONS.doItWithMe[currentLanguage]}</span>
+            <span>{getT(UI_TRANSLATIONS.doItWithMe, currentLanguage)}</span>
             <ArrowRight className="w-5 h-5 text-harshu-300" />
           </button>
 

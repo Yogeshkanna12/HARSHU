@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Language, ScreenState } from '../../types';
-import { ArrowLeft, Home, Award } from 'lucide-react';
+import { ArrowLeft, Home, Award, Globe, ChevronDown } from 'lucide-react';
+import { SUPPORTED_LANGUAGES } from '../../utils/speech';
 
 interface HeaderProps {
   currentLanguage: Language;
@@ -19,9 +20,15 @@ export const Header: React.FC<HeaderProps> = ({
   onHome,
   onOpenJudgeModal,
 }) => {
+  const [showAllLanguages, setShowAllLanguages] = useState(false);
+
   const showBack =
     currentState !== 'home' &&
     currentState !== 'opening';
+
+  const currentLangMeta =
+    SUPPORTED_LANGUAGES.find((l) => l.code === currentLanguage) ||
+    SUPPORTED_LANGUAGES[0];
 
   return (
     <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-earth-200/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-xs">
@@ -57,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
                 HARSHU
               </span>
               <span className="text-[10px] text-harshu-700 bg-harshu-100/80 px-1.5 py-0.5 rounded font-bold uppercase hidden md:inline">
-                Digital Guide
+                Multilingual Guide
               </span>
             </div>
             <span className="text-[10px] text-earth-700 font-medium hidden sm:inline">
@@ -80,41 +87,44 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline">Hackathon Story</span>
         </button>
 
-        {/* Language Selection */}
-        <div className="flex items-center gap-1 bg-earth-100 p-0.5 rounded-xl border border-earth-200">
+        {/* Multilingual Selector Dropdown */}
+        <div className="relative">
           <button
             type="button"
-            onClick={() => onSelectLanguage('ta')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-              currentLanguage === 'ta'
-                ? 'bg-harshu-800 text-white shadow-xs'
-                : 'text-earth-800 hover:bg-earth-200/50'
-            }`}
+            onClick={() => setShowAllLanguages(!showAllLanguages)}
+            className="flex items-center gap-1.5 bg-earth-100 hover:bg-earth-200/70 border border-earth-300 px-2.5 py-1 rounded-xl text-xs font-bold text-harshu-950 transition-colors"
+            title="Switch Language"
           >
-            தமிழ்
+            <Globe className="w-3.5 h-3.5 text-harshu-700" />
+            <span>{currentLangMeta.nativeLabel}</span>
+            <ChevronDown className="w-3 h-3 text-earth-600" />
           </button>
-          <button
-            type="button"
-            onClick={() => onSelectLanguage('hi')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-              currentLanguage === 'hi'
-                ? 'bg-harshu-800 text-white shadow-xs'
-                : 'text-earth-800 hover:bg-earth-200/50'
-            }`}
-          >
-            हिन्दी
-          </button>
-          <button
-            type="button"
-            onClick={() => onSelectLanguage('en')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-              currentLanguage === 'en'
-                ? 'bg-harshu-800 text-white shadow-xs'
-                : 'text-earth-800 hover:bg-earth-200/50'
-            }`}
-          >
-            EN
-          </button>
+
+          {showAllLanguages && (
+            <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-earth-300 rounded-2xl shadow-xl p-2 z-50 grid grid-cols-1 gap-1 max-h-80 overflow-y-auto animate-slide-up">
+              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-earth-500 border-b border-earth-100 mb-1">
+                Select Indian Language:
+              </div>
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => {
+                    onSelectLanguage(lang.code);
+                    setShowAllLanguages(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors ${
+                    currentLanguage === lang.code
+                      ? 'bg-harshu-100 text-harshu-900 font-bold'
+                      : 'hover:bg-earth-100 text-earth-800'
+                  }`}
+                >
+                  <span>{lang.nativeLabel}</span>
+                  <span className="text-[10px] text-earth-500 font-normal">{lang.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Home Button */}

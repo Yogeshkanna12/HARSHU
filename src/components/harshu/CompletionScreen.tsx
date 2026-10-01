@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Language, Resource } from '../../types';
-import { UI_TRANSLATIONS } from '../../utils/translations';
+import { UI_TRANSLATIONS, getT } from '../../utils/translations';
 import {
   CheckCircle2,
   ExternalLink,
   RotateCcw,
   Home,
-  ShieldCheck,
   Volume2,
   FileCheck2,
   Sparkles,
@@ -28,6 +27,10 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
   onRestart,
   onHome,
 }) => {
+  const congratsText = getT(UI_TRANSLATIONS.completedCongrats, currentLanguage);
+  const subText = getT(UI_TRANSLATIONS.completedSub, currentLanguage);
+  const resourceTitle = getT(resource.title, currentLanguage);
+
   // Fire gentle celebratory confetti on mount
   useEffect(() => {
     try {
@@ -42,12 +45,12 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
     }
 
     // Gentle speech celebration
-    const message = `${UI_TRANSLATIONS.completedCongrats[currentLanguage]}. ${UI_TRANSLATIONS.completedSub[currentLanguage]}`;
+    const message = `${congratsText}. ${subText}`;
     speakText(message, currentLanguage);
-  }, [currentLanguage]);
+  }, [currentLanguage, congratsText, subText]);
 
   const handleListenCompletion = () => {
-    const message = `${UI_TRANSLATIONS.completedCongrats[currentLanguage]}. ${UI_TRANSLATIONS.completedSub[currentLanguage]}`;
+    const message = `${congratsText}. ${subText}`;
     speakText(message, currentLanguage);
   };
 
@@ -64,7 +67,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
       {/* Main Congratulations Headline */}
       <div className="flex items-center justify-center gap-2 mb-2">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-harshu-950 tracking-tight">
-          {UI_TRANSLATIONS.completedCongrats[currentLanguage]}
+          {congratsText}
         </h1>
         <button
           type="button"
@@ -78,7 +81,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
       </div>
 
       <p className="text-sm sm:text-base text-earth-800 max-w-md mx-auto mb-6 leading-relaxed">
-        {UI_TRANSLATIONS.completedSub[currentLanguage]}
+        {subText}
       </p>
 
       {/* Completed Summary Card */}
@@ -86,31 +89,47 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
         <div className="flex items-center gap-2 text-xs font-bold text-harshu-800 uppercase tracking-wider mb-3">
           <FileCheck2 className="w-4 h-4 text-emerald-600" />
           <span>
-            {currentLanguage === 'ta' ? 'முடிவடைந்த வழிகாட்டல் விபரம்:' : currentLanguage === 'hi' ? 'पूर्ण किए गए कार्य का विवरण:' : 'Completed Task Summary:'}
+            {currentLanguage === 'ta'
+              ? 'முடிவடைந்த வழிகாட்டல் விபரம்:'
+              : currentLanguage === 'hi'
+              ? 'पूर्ण किए गए कार्य का विवरण:'
+              : 'Completed Task Summary:'}
           </span>
         </div>
 
         <h3 className="text-base sm:text-lg font-bold text-harshu-950 mb-2">
-          {resource.title[currentLanguage]}
+          {resourceTitle}
         </h3>
 
         <div className="space-y-2 mt-4">
           <div className="flex items-start gap-2.5 text-xs sm:text-sm text-earth-800">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <span>
-              {currentLanguage === 'ta' ? 'தகுதி வரம்புகள் சரிபார்க்கப்பட்டது' : currentLanguage === 'hi' ? 'पात्रता की शर्तें जांची गईं' : 'Eligibility criteria verified'}
+              {currentLanguage === 'ta'
+                ? 'தகுதி வரம்புகள் சரிபார்க்கப்பட்டது'
+                : currentLanguage === 'hi'
+                ? 'पात्रता की शर्तें जांची गईं'
+                : 'Eligibility criteria verified'}
             </span>
           </div>
           <div className="flex items-start gap-2.5 text-xs sm:text-sm text-earth-800">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <span>
-              {currentLanguage === 'ta' ? 'தேவையான 3 ஆவணங்கள் பட்டியலிடப்பட்டது' : currentLanguage === 'hi' ? 'जरूरी दस्तावेज सूची तैयार की गई' : 'Required 3 core documents listed'}
+              {currentLanguage === 'ta'
+                ? 'தேவையான 3 ஆவணங்கள் பட்டியலிடப்பட்டது'
+                : currentLanguage === 'hi'
+                ? 'जरूरी दस्तावेज सूची तैयार की गई'
+                : 'Required 3 core documents listed'}
             </span>
           </div>
           <div className="flex items-start gap-2.5 text-xs sm:text-sm text-earth-800">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <span>
-              {currentLanguage === 'ta' ? 'இ-சேவை மையம் அணுகும் வழிமுறை தெளிவுபடுத்தப்பட்டது' : currentLanguage === 'hi' ? 'ई-सेवा केंद्र की प्रक्रिया स्पष्ट की गई' : 'e-Sevai center procedure clarified'}
+              {currentLanguage === 'ta'
+                ? 'இ-சேவை மையம் அணுகும் வழிமுறை தெளிவுபடுத்தப்பட்டது'
+                : currentLanguage === 'hi'
+                ? 'ई-सेवा केंद्र की प्रक्रिया स्पष्ट की गई'
+                : 'e-Sevai center procedure clarified'}
             </span>
           </div>
         </div>
@@ -118,7 +137,11 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
         {/* Official External Link Warning / Transparent Handoff */}
         <div className="mt-5 pt-4 border-t border-earth-100 bg-earth-50/80 p-3.5 rounded-2xl">
           <span className="text-xs font-bold text-earth-700 block mb-1">
-            {currentLanguage === 'ta' ? 'அதிகாரப்பூர்வ அரசு இணைப்பு:' : currentLanguage === 'hi' ? 'आधिकारिक सरकारी पोर्टल:' : 'Official Government Source:'}
+            {currentLanguage === 'ta'
+              ? 'அதிகாரப்பூர்வ அரசு இணைப்பு:'
+              : currentLanguage === 'hi'
+              ? 'आधिकारिक सरकारी पोर्टल:'
+              : 'Official Government Source:'}
           </span>
           <p className="text-xs text-earth-600 mb-2">
             {currentLanguage === 'ta'
@@ -148,7 +171,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
           className="flex-1 py-4 px-6 bg-harshu-800 hover:bg-harshu-900 active:bg-harshu-950 text-white rounded-2xl font-bold text-sm sm:text-base shadow-md flex items-center justify-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
-          <span>{UI_TRANSLATIONS.startAnotherTask[currentLanguage]}</span>
+          <span>{getT(UI_TRANSLATIONS.startAnotherTask, currentLanguage)}</span>
         </button>
 
         <button
@@ -157,7 +180,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
           className="py-3.5 px-6 bg-earth-100 hover:bg-earth-200 text-earth-900 rounded-2xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-colors"
         >
           <Home className="w-4 h-4 text-earth-700" />
-          <span>{UI_TRANSLATIONS.backToHome[currentLanguage]}</span>
+          <span>{getT(UI_TRANSLATIONS.backToHome, currentLanguage)}</span>
         </button>
       </div>
 

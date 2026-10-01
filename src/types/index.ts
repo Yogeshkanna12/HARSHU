@@ -1,4 +1,17 @@
-export type Language = 'ta' | 'hi' | 'en';
+export type Language =
+  | 'ta' // Tamil
+  | 'hi' // Hindi
+  | 'en' // English
+  | 'mr' // Marathi
+  | 'gu' // Gujarati
+  | 'te' // Telugu
+  | 'kn' // Kannada
+  | 'ml' // Malayalam
+  | 'bn' // Bengali
+  | 'pa' // Punjabi
+  | 'or' // Odia
+  | 'as' // Assamese
+  | 'ur'; // Urdu
 
 export type ScreenState =
   | 'opening'
@@ -13,25 +26,36 @@ export type ScreenState =
 
 export type IntentCategory = 'jobs' | 'skills' | 'services' | 'welfare' | 'scholarship' | 'other';
 
+export interface ClarificationQuestion {
+  text: string;
+  options: string[];
+}
+
 export interface IntentResult {
   category: IntentCategory;
   rawInput: string;
   recognizedText: string;
-  summaryByLanguage: Record<Language, string>;
+  detectedLanguage: Language;
+  detectedLanguageName: string;
+  interpretedMeaning: string; // What the user is actually asking
+  directAnswer: string; // HARSHU's direct, factual, helpful answer to the user's question
+  summaryByLanguage: Record<string, string>;
   schemeId: string;
+  clarificationQuestion?: ClarificationQuestion;
+  isAiGenerated?: boolean;
 }
 
 export interface QuestionOption {
   id: string;
-  label: Record<Language, string>;
+  label: Record<string, string>;
   icon?: string;
-  description?: Record<Language, string>;
+  description?: Record<string, string>;
 }
 
 export interface Question {
   id: string;
-  questionText: Record<Language, string>;
-  helperText?: Record<Language, string>;
+  questionText: Record<string, string>;
+  helperText?: Record<string, string>;
   options: QuestionOption[];
 }
 
@@ -51,22 +75,30 @@ export interface GuidedStep {
 
 export interface Resource {
   id: string;
-  title: Record<Language, string>;
-  department: Record<Language, string>;
-  whatItHelps: Record<Language, string>;
-  whoItIsFor: Record<Language, string>;
-  eligibility: Record<Language, string[]>;
-  documents: Record<Language, string[]>;
+  title: Record<string, string>;
+  department: Record<string, string>;
+  whatItHelps: Record<string, string>;
+  whoItIsFor: Record<string, string>;
+  eligibility: Record<string, string[]>;
+  documents: Record<string, string[]>;
   officialSource: string;
   officialUrl: string;
   category: IntentCategory;
   questions?: Question[];
-  steps: Record<Language, GuidedStep[]>;
+  steps: Record<string, GuidedStep[]>;
 }
 
 export interface AcronymInfo {
   letter: string;
   word: string;
-  meaning: Record<Language, string>;
-  description: Record<Language, string>;
+  meaning: Record<string, string>;
+  description: Record<string, string>;
+}
+
+export interface SupportedLanguageMeta {
+  code: Language;
+  label: string;
+  nativeLabel: string;
+  script: string;
+  bcp47: string;
 }
