@@ -11,6 +11,9 @@ import {
   FileCheck2,
   Sparkles,
   Award,
+  ShieldCheck,
+  Lock,
+  ArrowUpRight,
 } from 'lucide-react';
 import { speakText } from '../../utils/speech';
 
@@ -52,6 +55,14 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
   const handleListenCompletion = () => {
     const message = `${congratsText}. ${subText}`;
     speakText(message, currentLanguage);
+  };
+
+  const handleOpenOfficialWebsite = () => {
+    if (!resource.officialUrl || resource.officialUrl === '#' || resource.officialUrl.startsWith('javascript:')) {
+      alert('Official portal URL is currently unavailable.');
+      return;
+    }
+    window.open(resource.officialUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -106,60 +117,74 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <span>
               {currentLanguage === 'ta'
-                ? 'தகுதி வரம்புகள் சரிபார்க்கப்பட்டது'
+                ? 'தகுதி வரம்புகள் மற்றும் விதிமுறைகள் சரிபார்க்கப்பட்டது'
                 : currentLanguage === 'hi'
-                ? 'पात्रता की शर्तें जांची गईं'
-                : 'Eligibility criteria verified'}
+                ? 'पात्रता की शर्तें व नियम सत्यापित किए गए'
+                : 'Eligibility conditions and requirements verified'}
             </span>
           </div>
           <div className="flex items-start gap-2.5 text-xs sm:text-sm text-earth-800">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <span>
               {currentLanguage === 'ta'
-                ? 'தேவையான 3 ஆவணங்கள் பட்டியலிடப்பட்டது'
+                ? 'தேவையான அனைத்து முக்கிய ஆவணங்களும் பட்டியலிடப்பட்டது'
                 : currentLanguage === 'hi'
-                ? 'जरूरी दस्तावेज सूची तैयार की गई'
-                : 'Required 3 core documents listed'}
+                ? 'जरूरी सभी मुख्य दस्तावेजों की सूची तैयार की गई'
+                : 'All essential documents identified and checked'}
             </span>
           </div>
           <div className="flex items-start gap-2.5 text-xs sm:text-sm text-earth-800">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <span>
               {currentLanguage === 'ta'
-                ? 'இ-சேவை மையம் அணுகும் வழிமுறை தெளிவுபடுத்தப்பட்டது'
+                ? 'அதிகாரப்பூர்வ அரசு இணையதள செயல்முறை தெளிவாக விளக்கப்பட்டது'
                 : currentLanguage === 'hi'
-                ? 'ई-सेवा केंद्र की प्रक्रिया स्पष्ट की गई'
-                : 'e-Sevai center procedure clarified'}
+                ? 'आधिकारिक सरकारी पोर्टल की प्रक्रिया समझाई गई'
+                : 'Official government portal application steps clarified'}
             </span>
           </div>
         </div>
 
-        {/* Official External Link Warning / Transparent Handoff */}
-        <div className="mt-5 pt-4 border-t border-earth-100 bg-earth-50/80 p-3.5 rounded-2xl">
-          <span className="text-xs font-bold text-earth-700 block mb-1">
-            {currentLanguage === 'ta'
-              ? 'அதிகாரப்பூர்வ அரசு இணைப்பு:'
-              : currentLanguage === 'hi'
-              ? 'आधिकारिक सरकारी पोर्टल:'
-              : 'Official Government Source:'}
-          </span>
-          <p className="text-xs text-earth-600 mb-2">
-            {currentLanguage === 'ta'
-              ? 'உண்மையான விண்ணப்பத்தை இ-சேவை மையம் மூலமாகவோ அல்லது கீழே உள்ள அதிகாரப்பூர்வ அரசு தளத்திலோ சமர்ப்பிக்கலாம்.'
-              : currentLanguage === 'hi'
-              ? 'वास्तविक आवेदन अपने नजदीकी ई-सेवा केंद्र या नीचे दिए गए सरकारी पोर्टल पर जमा किया जा सकता है।'
-              : 'Official submissions are processed through certified e-Sevai centres or the state government portal directly.'}
-          </p>
+        {/* Real Verified Government Gateway Handoff */}
+        <div className="mt-5 pt-4 border-t border-earth-100 bg-emerald-50/80 p-4 rounded-2xl border border-emerald-200">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-900 mb-1">
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+            <span>
+              {currentLanguage === 'ta'
+                ? 'சரிபார்க்கப்பட்ட அதிகாரப்பூர்வ அரசு தளம்:'
+                : currentLanguage === 'hi'
+                ? 'सत्यापित आधिकारिक सरकारी पोर्टल:'
+                : 'Verified Official Government Destination:'}
+            </span>
+          </div>
 
-          <a
-            href={resource.officialUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-harshu-800 hover:text-harshu-950 underline"
+          <div className="flex items-center gap-1 text-xs text-emerald-800 font-mono font-semibold mb-2 break-all">
+            <Lock className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+            <span>{resource.officialUrl}</span>
+          </div>
+
+          {resource.domainHierarchy && (
+            <p className="text-xs text-emerald-800/90 mb-3">
+              {resource.domainHierarchy}
+            </p>
+          )}
+
+          {/* Prominent Visit Official Website Button */}
+          <button
+            type="button"
+            onClick={handleOpenOfficialWebsite}
+            className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white rounded-xl font-bold text-sm sm:text-base shadow-sm transition-all flex items-center justify-center gap-2"
           >
-            <span>{resource.officialSource}</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+            <ShieldCheck className="w-4 h-4" />
+            <span>
+              {currentLanguage === 'ta'
+                ? 'அதிகாரப்பூர்வ அரசு தளத்திற்குச் செல்லவும் (Visit Official Website)'
+                : currentLanguage === 'hi'
+                ? 'आधिकारिक सरकारी पोर्टल खोलें (Visit Official Website)'
+                : 'Visit Official Government Website'}
+            </span>
+            <ArrowUpRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
 

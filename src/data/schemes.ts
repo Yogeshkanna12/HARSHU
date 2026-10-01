@@ -62,7 +62,12 @@ export const VERIFIED_SCHEMES: Resource[] = [
       ],
     },
     officialSource: 'Tamil Nadu Social Welfare Portal (tnsocialwelfare.tn.gov.in)',
+    officialSourceName: 'Tamil Nadu Social Welfare Portal (tnsocialwelfare.tn.gov.in)',
     officialUrl: 'https://tnsocialwelfare.tn.gov.in',
+    sourceType: 'official',
+    verified: true,
+    domainHierarchy: 'Directorate of Social Welfare, Govt. of Tamil Nadu (.gov.in)',
+    lastVerified: 'Active 2026',
     questions: [
       {
         id: 'tailoring_exp',
@@ -329,7 +334,12 @@ export const VERIFIED_SCHEMES: Resource[] = [
       ],
     },
     officialSource: 'Pudhumai Penn Official Portal (penkalvi.tn.gov.in)',
+    officialSourceName: 'Pudhumai Penn Official Portal (penkalvi.tn.gov.in)',
     officialUrl: 'https://penkalvi.tn.gov.in',
+    sourceType: 'official',
+    verified: true,
+    domainHierarchy: 'Social Welfare & Women Empowerment Dept, Govt. of Tamil Nadu (.gov.in)',
+    lastVerified: 'Active 2026',
     steps: {
       ta: [
         {
@@ -532,7 +542,12 @@ export const VERIFIED_SCHEMES: Resource[] = [
       ],
     },
     officialSource: 'Kalaignar Magalir Urimai Thittam (kmut.tn.gov.in)',
+    officialSourceName: 'Kalaignar Magalir Urimai Thittam (kmut.tn.gov.in)',
     officialUrl: 'https://kmut.tn.gov.in',
+    sourceType: 'official',
+    verified: true,
+    domainHierarchy: 'Special Programme Implementation Dept, Govt. of Tamil Nadu (.gov.in)',
+    lastVerified: 'Active 2026',
     steps: {
       ta: [
         {
@@ -735,7 +750,12 @@ export const VERIFIED_SCHEMES: Resource[] = [
       ],
     },
     officialSource: 'Skill India Digital & TNSDC (skillindiadigital.gov.in)',
+    officialSourceName: 'Skill India Digital & TNSDC (skillindiadigital.gov.in)',
     officialUrl: 'https://www.skillindiadigital.gov.in',
+    sourceType: 'official',
+    verified: true,
+    domainHierarchy: 'Ministry of Skill Development & Entrepreneurship, Govt. of India (.gov.in)',
+    lastVerified: 'Active 2026',
     steps: {
       ta: [
         {

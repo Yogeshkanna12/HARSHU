@@ -1,12 +1,23 @@
-import { IntentResult, Language } from '../types';
+import { IntentResult, Language, Resource } from '../types';
 import { VERIFIED_SCHEMES } from '../data/schemes';
 import { understandUserNeed, detectLanguageFromText } from './aiService';
+import {
+  OFFICIAL_GOV_REGISTRY,
+  discoverOfficialResource,
+  buildResourceFromEntry,
+} from './resourceDiscovery';
 
 export async function detectIntentAsync(
   rawText: string,
   preferredLang: Language
 ): Promise<IntentResult> {
-  return await understandUserNeed(rawText, preferredLang);
+  const result = await understandUserNeed(rawText, preferredLang);
+  const discovered = await discoverOfficialResource(rawText, preferredLang);
+  return {
+    ...result,
+    schemeId: discovered.id,
+    discoveredResource: discovered,
+  };
 }
 
 // Synchronous wrapper for instant fallback/testing
@@ -147,6 +158,14 @@ export function detectIntent(rawText: string, preferredLang: Language): IntentRe
   };
 }
 
-export function getSchemeById(schemeId: string) {
-  return VERIFIED_SCHEMES.find((s) => s.id === schemeId) || VERIFIED_SCHEMES[0];
+export function getSchemeById(schemeId: string): Resource {
+  const found = VERIFIED_SCHEMES.find((s) => s.id === schemeId);
+  if (found) return found;
+
+  const registryMatch = OFFICIAL_GOV_REGISTRY.find((e) => e.id === schemeId);
+  if (registryMatch) {
+    return buildResourceFromEntry(registryMatch);
+  }
+
+  return VERIFIED_SCHEMES[0];
 }

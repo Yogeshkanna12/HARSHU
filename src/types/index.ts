@@ -41,6 +41,7 @@ export interface IntentResult {
   directAnswer: string; // HARSHU's direct, factual, helpful answer to the user's question
   summaryByLanguage: Record<string, string>;
   schemeId: string;
+  discoveredResource?: Resource;
   clarificationQuestion?: ClarificationQuestion;
   isAiGenerated?: boolean;
 }
@@ -73,6 +74,8 @@ export interface GuidedStep {
   badge?: string;
 }
 
+export type SourceType = 'official' | 'government-backed' | 'other';
+
 export interface Resource {
   id: string;
   title: Record<string, string>;
@@ -82,7 +85,12 @@ export interface Resource {
   eligibility: Record<string, string[]>;
   documents: Record<string, string[]>;
   officialSource: string;
-  officialUrl: string;
+  officialSourceName?: string;
+  officialUrl: string; // The real, verified destination URL (MUST NOT BE FAKE)
+  sourceType: SourceType;
+  verified: boolean;
+  domainHierarchy?: string;
+  lastVerified?: string;
   category: IntentCategory;
   questions?: Question[];
   steps: Record<string, GuidedStep[]>;

@@ -144,7 +144,19 @@ export const JudgeModal: React.FC<JudgeModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* 5. Privacy & Trust Architecture */}
+        {/* 5. Dynamic Resource Discovery & Real Web Navigation */}
+        <div className="mb-6 p-4 bg-emerald-50/80 rounded-2xl border border-emerald-300 text-xs text-emerald-950 space-y-2">
+          <div className="flex items-center gap-1.5 font-bold text-emerald-900 mb-1">
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+            <span>Dynamic Official Resource Discovery & Real Web Navigation:</span>
+          </div>
+          <p>• <strong>Zero Hallucinated URLs:</strong> HARSHU strictly enforces authentic government domains (.gov.in, .nic.in, or statutory bodies like SIDBI Mudra). URLs are never guessed or constructed from scheme names.</p>
+          <p>• <strong>Dynamic Intent Routing:</strong> Automatically maps queries (like <em>"Are there scholarships for college students?"</em> or <em>"Mudra loan for home boutique"</em>) to authentic portals such as NSP (scholarships.gov.in) and Mudra (mudra.org.in).</p>
+          <p>• <strong>Pre-Navigation Reassurance Dialog:</strong> Explains what the user will see on the government portal before navigating, keeping first-time users calm and confident.</p>
+          <p>• <strong>Working Real Navigation:</strong> "Visit Official Website" triggers real browser navigation in a new tab with no dead ends or fake anchor hashes.</p>
+        </div>
+
+        {/* 6. Privacy & Trust Architecture */}
         <div className="p-4 bg-earth-100/70 rounded-2xl border border-earth-200 text-xs text-earth-800 space-y-1.5 mb-6">
           <div className="flex items-center gap-1.5 font-bold text-harshu-900 mb-1">
             <ShieldCheck className="w-4 h-4 text-harshu-700" />

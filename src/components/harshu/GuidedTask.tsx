@@ -270,6 +270,20 @@ export const GuidedTask: React.FC<GuidedTaskProps> = ({
             </span>
             <ArrowRight className="w-5 h-5 text-harshu-300" />
           </button>
+
+          {currentStepIndex === totalSteps - 1 && resource.officialUrl && (
+            <div className="mt-3 text-center">
+              <a
+                href={resource.officialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-950 underline"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                <span>{resource.officialSource} ({resource.officialUrl}) ↗</span>
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Safety Microcopy */}

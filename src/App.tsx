@@ -65,7 +65,8 @@ export const App: React.FC = () => {
       if (intentResult.detectedLanguage) {
         setCurrentLanguage(intentResult.detectedLanguage);
       }
-      setActiveResource(getSchemeById(intentResult.schemeId));
+      const res = intentResult.discoveredResource || getSchemeById(intentResult.schemeId);
+      setActiveResource(res);
       setScreenState('intent_confirm');
     } finally {
       setIsAnalyzing(false);
@@ -80,7 +81,8 @@ export const App: React.FC = () => {
       if (intentResult.detectedLanguage) {
         setCurrentLanguage(intentResult.detectedLanguage);
       }
-      setActiveResource(getSchemeById(intentResult.schemeId));
+      const res = intentResult.discoveredResource || getSchemeById(intentResult.schemeId);
+      setActiveResource(res);
       setScreenState('intent_confirm');
     } finally {
       setIsAnalyzing(false);
